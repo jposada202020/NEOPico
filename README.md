@@ -4,7 +4,9 @@ MicroPython NeoPixel library with animations
 * Author: Jose D. Montoya
 
 Colowheel adapted from code from Kattni Rembor for Adafruit Industries
+
 Pio from https://toptechboy.com/page/2/ Paul McWhorter
+
 sinoussoidal data generator written by Jan Bednarik https://github.com/JanBednarik/micropython-ws2812
 
 There are amazing libraries for NeoPixels like Adafruit_CircuitPython_NeoPixel and Adafruit_CircuitPython_LED_Animation

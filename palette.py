@@ -7,7 +7,7 @@
 `palette`
 ================================================================================
 
-Palette generator for NeoPixel LED strips. Adapted from https://github.com/gddickinson/colour-palette
+Palette generator for NeoPixel LED strips.
 
 
 * Author: Jose D. Montoya
@@ -28,7 +28,7 @@ class HarmonyType:
 
 
 class Color:
-    def __init__(self, r, g, b):
+    def __init__(self, r=0, g=0, b=0):
         self.r = r
         self.g = g
         self.b = b
@@ -75,12 +75,20 @@ def interpolate_color(start_color, end_color, factor):
     ]
 
 
+def interpolate_color_p(color1, color2, factor):
+    r = int(color1[0] + (color2[0] - color1[0]) * factor)
+    g = int(color1[1] + (color2[1] - color1[1]) * factor)
+    b = int(color1[2] + (color2[2] - color1[2]) * factor)
+    return [r, g, b]
+
+
 def blend_colors(colors, num_steps=8):
     num_colors = len(colors)
     num_steps = num_steps
     segment_length = num_steps // (num_colors - 1)
 
     blended = [[0 for _ in range(3)] for _ in range(num_steps)]
+    print(blended)
 
     for i in range(num_colors - 1):
         start_color = colors[i].to_rgb()
@@ -166,6 +174,67 @@ def generate_palette(
         )
 
     return colors_rgb
+
+
+def generate_color_palette(base_color, stretch, num_colors=12):
+    palette = []
+    base_r, base_g, base_b = base_color
+
+    for i in range(num_colors):
+        r = (base_r + (i * stretch) % 256) % 256
+        g = (base_g + ((i * stretch) // 2) % 256) % 256
+        b = (base_b + ((i * stretch) // 3) % 256) % 256
+        palette.append((r, g, b))
+
+    return palette
+
+
+def generate_pastel_palette(base_color, stretch, num_colors=12):
+    palette = []
+    base_r, base_g, base_b = base_color
+
+    for i in range(num_colors):
+        r = (base_r + i * stretch) % 256
+        g = (base_g + i * stretch) % 256
+        b = (base_b + i * stretch) % 256
+
+        # Mix with white to create pastel colors
+        r = (r + 255) // 2
+        g = (g + 255) // 2
+        b = (b + 255) // 2
+
+        palette.append((r, g, b))
+
+    return palette
+
+
+def generate_three_color_palette(color1, color2, color3, num_colors=16):
+    palette = []
+    segment_size = num_colors // 2
+
+    # Interpolate between color1 and color2
+    for i in range(segment_size):
+        factor = i / segment_size
+        palette.append(interpolate_color_p(color1, color2, factor))
+
+    # Interpolate between color2 and color3
+    for i in range(segment_size):
+        factor = i / segment_size
+        palette.append(interpolate_color_p(color2, color3, factor))
+
+    return palette
+
+
+def generate_three_color_pastel_palette(color1, color2, color3, num_colors=16):
+    palette = generate_three_color_palette(color1, color2, color3, num_colors)
+
+    # Mix each color with white to create pastel colors
+    for color in palette:
+        color[0] = (color[0] + 255) // 2
+        color[1] = (color[1] + 255) // 2
+        color[2] = (color[2] + 255) // 2
+
+    return palette
 
 
 if __name__ == "__main__":

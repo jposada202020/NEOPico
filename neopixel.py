@@ -153,6 +153,7 @@ class NEOPIXEL:
             sideset_base=Pin(self.pin),
         )
         self.sm.active(1)
+        self.fill_all(color=(0, 0, 0))
 
     def rainbow_cycle(self, time_delta: float = 0.1, duration: int = 5) -> None:
         """
@@ -196,7 +197,7 @@ class NEOPIXEL:
 
     def fill_all(
         self,
-        duration: int = 5,
+        duration: int = 0.1,
         time_delta: float = 0.1,
         color: tuple = (255, 0, 0),
     ) -> None:
@@ -207,6 +208,7 @@ class NEOPIXEL:
         :param tuple color: the color to fill. Default is (255, 0, 0) i.e. red
         :return: None
         """
+        color = color
         start_time = time.time()
         while time.time() - start_time < duration:
             # Set all pixels to the same color
@@ -298,6 +300,20 @@ class NEOPIXEL:
                 ]
             self.ShowNeoPixels(self.neopixel_list)
             time.sleep(0.2)
+
+    def fill_custom(self, color_list: list, duration: int = 5) -> None:
+        """
+        Fill the NeoPixels with custom colors.
+        :param list color_list: list of colors
+        :param int duration: duration in seconds. Default is 5 seconds
+        :return: None
+        """
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            for i in range(self.num_leds):
+                self.neopixel_list[i] = color_list[i]
+            self.ShowNeoPixels(self.neopixel_list)
+            time.sleep(0.5)
 
     def brightness(self, brightness: float = 1.0) -> None:
         """
@@ -401,8 +417,7 @@ class NEOPIXEL:
 
 
 if __name__ == "__main__":
-    ring = NEOPIXEL(Pin(15), 16)
-
+    ring = NEOPIXEL(Pin(15), 8)
     ring.chasing_color()
     ring.fill_all(color=(0, 255, 0))
     ring.blink_rainbow(background_color=(0, 255, 0))

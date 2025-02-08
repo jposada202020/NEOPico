@@ -1,0 +1,13 @@
+[wokwi]
+version = 1
+elf = "/RPI_PICO-20241129-v1.24.1.uf2"
+firmware = "/RPI_PICO-20241129-v1.24.1.uf2"
+rfc2217ServerPort = 4000
+
+# python -m mpremote connect port:rfc2217://localhost:4000 run main.py
+# python -m mpremote connect port:rfc2217://localhost:4000 fs cp main.py
+# python -m mpremote connect port:rfc2217://localhost:4000 fs ls
+# python -m mpremote connect port:rfc2217://localhost:4000 fs cat main.py
+# /home/jose/Documents/Development/personal_projects/raspberrypi_pico/libraries/
+# python -m mpremote connect port:rfc2217://localhost:4000 cp -r /home/jose/Documents/Development/personal_projects/raspberrypi_pico/libraries/micropython_uplot :/
+# mpremote connect port:rfc2217://localhost:4000 cp -r /home/jose/Documents/Development/personal_projects/raspberrypi_pico/libraries/

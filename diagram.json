@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "author": "jposada202020",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-pi-pico",
+      "id": "pico",
+      "top": 0,
+      "left": 0,
+      "attrs": { "env": "micropython-20231227-v1.22.0" }
+    },
+    {
+      "type": "wokwi-led-ring",
+      "id": "ring1",
+      "top": -152.96,
+      "left": -200.41,
+      "attrs": { "pixels": "16" }
+    }
+  ],
+  "connections": [
+    [ "pico:VSYS", "ring1:VCC", "green", [ "h0" ] ],
+    [ "ring1:GND", "pico:GND.8", "black", [ "v0" ] ],
+    [ "ring1:DIN", "pico:GP15", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

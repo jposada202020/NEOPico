@@ -27,6 +27,7 @@ import rp2
 import time
 from math import log, e, sin
 from random import choice
+import palette
 
 try:
     from typing import Tuple
@@ -47,6 +48,7 @@ class NEOPIXEL:
         """
         self.pin = pin
         self.num_leds = num_leds
+        self.palette_colors = [BLACK for _ in range(self.num_leds)]
 
         self.rainbow = [
             (126, 1, 0),
@@ -415,9 +417,135 @@ class NEOPIXEL:
                 self.ShowNeoPixels(data)
                 time.sleep(dwell)
 
+    def random_color(self, num_leds: int = 8, duration: int = 5):
+        """
+        Random color data for testing
+        :param int num_leds: number of leds. Default is 8 leds
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+
+        limits = range(0, 256)
+
+        start_time = time.time()
+
+        while time.time() - start_time < duration:
+            self.neopixel_list = [
+                (choice(limits), choice(limits), choice(limits))
+                for _ in range(num_leds)
+            ]
+            self.ShowNeoPixels(self.neopixel_list)
+            time.sleep(0.1)
+
+    def twinkle(self, duration: int = 5):
+        """
+        Dummy data for testing.
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+
+        start_time = time.time()
+
+        while time.time() - start_time < duration:
+            self.neopixel_list = [
+                choice(self.palette_colors) for _ in range(self.num_leds)
+            ]
+            self.ShowNeoPixels(self.neopixel_list)
+            time.sleep(0.1)
+
+    def create_harmony_palette(
+        self,
+        palette_name: palette.HarmonyType = palette.HarmonyType.COMPLEMENTARY,
+        default_color_number=50,
+        seed: int = 1999,
+    ):
+        palette_data = palette.generate_palette(
+            temperature="neutral",
+            harmony_type=palette_name,
+            seeding=seed,
+        )
+        self.palette_colors = palette.blend_colors(
+            palette_data, default_color_number
+        )
+
+    def define_palette(
+        self,
+        palette_name: str = "harmony1",
+        default_color_number=50,
+        seed: int = 1999,
+        colors=(90, 180, 27),
+        stretch: int = 350,
+    ):
+        """
+        Define a palette based in different algorithms. Be aware that some palettes require a specific number of colors.
+        Also not all options are available for all palettes. Reading the function documentation is recommended.
+        :param str palette_name: the name of the palette. Default is "harmony1". Options are:
+         "harmony1", "harmony2", "harmony3", "harmony4", "one_color", "one_color_pastel",
+         "three_colors", "three_colors_pastel". Please refer to each function for more details.
+        :param int default_color_number: the number of default colors. Default is 50
+        :param int seed: the seed value. Default is 1999
+        :param tuple colors: the colors. Default is (90, 180, 27)
+        :param int stretch: the stretch value. Default is 350
+        :return: None
+        """
+
+        if palette_name == "harmony1":
+            self.create_harmony_palette(
+                palette.HarmonyType.COMPLEMENTARY, default_color_number, seed
+            )
+
+        elif palette_name == "harmony2":
+            self.create_harmony_palette(
+                palette.HarmonyType.ANALOGOUS, default_color_number, seed
+            )
+
+        elif palette_name == "harmony3":
+            self.create_harmony_palette(
+                palette.HarmonyType.TRIADIC, default_color_number, seed
+            )
+
+        elif palette_name == "harmony4":
+            self.create_harmony_palette(
+                palette.HarmonyType.TETRADIC, default_color_number, seed
+            )
+
+        elif palette_name == "one_color":
+            if isinstance(colors, list):
+                raise ValueError("Color list must have only one color")
+
+            self.palette_colors = palette.generate_color_palette(
+                colors, stretch, default_color_number
+            )
+
+        elif palette_name == "one_color_pastel":
+            if isinstance(colors, list):
+                raise ValueError("Color list must have only one color")
+
+            self.palette_colors = palette.generate_pastel_palette(
+                colors, stretch, default_color_number
+            )
+
+        elif palette_name == "three_colors":
+            if isinstance(colors, tuple):
+                raise ValueError("Color list must have three colors")
+
+            self.palette_colors = palette.generate_three_color_palette(
+                colors[0], colors[1], colors[2], default_color_number
+            )
+
+        elif palette_name == "three_colors_pastel":
+            if isinstance(colors, tuple):
+                raise ValueError("Color list must have three colors")
+
+            self.palette_colors = palette.generate_three_color_pastel_palette(
+                colors[0], colors[1], colors[2], default_color_number
+            )
+
+        else:
+            raise ValueError("Palette not defined")
+
 
 if __name__ == "__main__":
     ring = NEOPIXEL(Pin(15), 8)
+    ring.define_palette()
     ring.chasing_color()
     ring.fill_all(color=(0, 255, 0))
     ring.blink_rainbow(background_color=(0, 255, 0))

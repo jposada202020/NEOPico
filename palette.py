@@ -25,6 +25,9 @@ except ImportError:
 
 class HarmonyType:
     COMPLEMENTARY = "complementary"
+    TRIADIC = "triadic"
+    ANALOGOUS = "analogous"
+    TETRADIC = "tetradic"
 
 
 def hsv_to_rgb(
@@ -104,11 +107,10 @@ def blend_colors(colors: list, num_steps: int = 8) -> list:
     segment_length = num_steps // (num_colors - 1)
 
     blended = [[0 for _ in range(3)] for _ in range(num_steps)]
-    print(blended)
 
     for i in range(num_colors - 1):
-        start_color = colors[i].to_rgb()
-        end_color = colors[i + 1].to_rgb()
+        start_color = colors[i]
+        end_color = colors[i + 1]
 
         for j in range(segment_length):
             factor = j / segment_length
@@ -193,6 +195,28 @@ def generate_harmony(
         complementary = adjust_color(base_color, hue_shift=0.5)
         colors.append(complementary)
 
+    if harmony_type == HarmonyType.TRIADIC:
+        colors.extend(
+            [
+                adjust_color(base_color, hue_shift=1 / 3),
+                adjust_color(base_color, hue_shift=2 / 3),
+            ]
+        )
+
+    if harmony_type == HarmonyType.ANALOGOUS:
+        for i in range(1, num_colors):
+            shift = 0.05 * i
+            colors.append(adjust_color(base_color, hue_shift=shift))
+
+    if harmony_type == HarmonyType.TETRADIC:
+        colors.extend(
+            [
+                adjust_color(base_color, hue_shift=0.25),
+                adjust_color(base_color, hue_shift=0.5),
+                adjust_color(base_color, hue_shift=0.75),
+            ]
+        )
+
     return colors
 
 
@@ -221,8 +245,9 @@ def generate_palette(
         rgb = hsv_to_rgb(*color)
 
         colors_rgb.append(
-            Color(int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
+            (int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
         )
+    print(colors_rgb)
 
     return colors_rgb
 
@@ -333,7 +358,7 @@ def generate_three_color_pastel_palette(
 
 
 if __name__ == "__main__":
-    colors = generate_palette(seeding=42)
+    colors = generate_palette(harmony_type=HarmonyType.TRIADIC, seeding=42)
 
     # Blend the colors and create a list of 16 colors
     blended = blend_colors(colors, 8)

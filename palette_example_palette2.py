@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Jose D. Montoya, DJDevon
+#
+# SPDX-License-Identifier: MIT
+
 import palette
 import time
 from neopixel import NEOPIXEL

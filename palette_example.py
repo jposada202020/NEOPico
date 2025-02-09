@@ -7,19 +7,25 @@ from neopixel import NEOPIXEL
 from machine import Pin
 from palette import HarmonyType
 
-# Example of generating a palette and blending the colors and displaying them
-
+# Create a NeoPixel ring with 16 pixels connected to pin 15
 ring = NEOPIXEL(Pin(15), 16)
+
+# Generate a palette of 8 colors with a neutral temperature and a complementary harmony
 colors_complementary = palette.generate_palette(
     temperature="neutral", harmony_type=HarmonyType.COMPLEMENTARY, seeding=1999
 )
+
+# Generate a palette of 8 colors with a neutral temperature and a triadic harmony
 colors_triadic = palette.generate_palette(
     temperature="neutral", harmony_type=HarmonyType.TRIADIC, seeding=1999
 )
+
+# Generate a palette of 8 colors with a neutral temperature and an analogous harmony
 colors_analogous = palette.generate_palette(
     temperature="neutral", harmony_type=HarmonyType.ANALOGOUS, seeding=1999
 )
-# Blend the colors and create a list of 16 colors
+
+# Blend the colors and create a list of 8 colors
 blended_complementary = palette.blend_colors(colors_complementary, 8)
 blended_triadic = palette.blend_colors(colors_triadic, 8)
 blended_analogous = palette.blend_colors(colors_analogous, 8)

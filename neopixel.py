@@ -424,32 +424,49 @@ class NEOPIXEL:
         :param int duration: duration in seconds. Default is 5 seconds
         """
 
-        limits = range(0, 256)
+        from effects import random_color
 
-        start_time = time.time()
-
-        while time.time() - start_time < duration:
-            self.neopixel_list = [
-                (choice(limits), choice(limits), choice(limits))
-                for _ in range(num_leds)
-            ]
-            self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(0.1)
+        random_color(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
 
     def twinkle(self, duration: int = 5):
         """
         Dummy data for testing.
         :param int duration: duration in seconds. Default is 5 seconds
         """
+        from effects import twinkle_effect
 
-        start_time = time.time()
+        twinkle_effect(
+            self,
+            self.palette_colors,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
 
-        while time.time() - start_time < duration:
-            self.neopixel_list = [
-                choice(self.palette_colors) for _ in range(self.num_leds)
-            ]
-            self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(0.1)
+    def segment(self, segment_length: int, values: list, duration: int = 5):
+        """
+        Get led segments
+        :param int segment_length: the segment length
+        :param list values: the values
+        :return: the segments
+        """
+
+        from effects import segment_effect
+
+        segment_effect(
+            self,
+            self.palette_colors,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+            segment_length,
+            values,
+        )
 
     def create_harmony_palette(
         self,

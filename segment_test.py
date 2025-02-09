@@ -2,19 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-
+import palette
 from neopixel import NEOPIXEL
 from machine import Pin
 
 # Create a NeoPixel strip with 8 pixels connected to pin 15
 led_strip = NEOPIXEL(Pin(15), 8)
 
-# Define a palette with three pastel colors
-colors = [(90, 180, 27), (111, 123, 154), (231, 45, 120)]
-led_strip.define_palette("three_colors_pastel", colors=colors)
+# Define the colors to include in the segment
+values = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (80, 0, 80)]
 
-# Create a Twinkle animation with the three pastel colors for 15 seconds
-led_strip.twinkle(15)
+# show the segment of colors. The segment is 2 pixels long
+led_strip.segment(2, values)
 
 # Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

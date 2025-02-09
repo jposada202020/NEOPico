@@ -25,9 +25,34 @@ NUM_LEDS = 64
 led_list = [BLACK for _ in range(NUM_LEDS)]
 
 
+def rainbow_cycle_effect(
+    led_object,
+    neopixel_list,
+    num_leds,
+    time_delta: float = 0.1,
+    duration: int = 5,
+) -> None:
+    """
+    Cycle through the rainbow colors.
+    :param float time_delta: time delay between each color change: default 0.1 seconds
+    :param int duration: duration in seconds: default 5 seconds
+    :return: None
+    """
+    from rainbow import rainbow_colors
+
+    rainbow_set = rainbow_colors
+
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        rainbow_set = rainbow_set[-1:] + rainbow_set[:-1]
+        for i in range(num_leds):
+            neopixel_list[i] = rainbow_set[i]
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        time.sleep(time_delta)
+
+
 def segment_effect(
     led_object,
-    palette_colors,
     neopixel_list,
     num_leds,
     duration: int = 5,
@@ -105,23 +130,3 @@ def assign_values_to_segments(segments, values):
 
 def flatten_segments(assigned_segments):
     return [led for segment in assigned_segments for led in segment]
-
-
-# Example usage
-segment_length = 8
-led_segments = get_led_segments(led_list, segment_length)
-values = [
-    (0, 0, 255),
-    (0, 255, 0),
-    (255, 0, 0),
-    (255, 255, 0),
-    (255, 0, 255),
-    (0, 255, 255),
-    (255, 255, 255),
-    (80, 80, 80),
-    (160, 160, 160),
-]
-
-assigned_segments = assign_values_to_segments(led_segments, values)
-print(f"Assigned segments: {assigned_segments}")
-flattened_segments = flatten_segments(assigned_segments)

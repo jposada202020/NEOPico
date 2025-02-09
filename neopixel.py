@@ -50,41 +50,6 @@ class NEOPIXEL:
         self.num_leds = num_leds
         self.palette_colors = [BLACK for _ in range(self.num_leds)]
 
-        self.rainbow = [
-            (126, 1, 0),
-            (114, 13, 0),
-            (102, 25, 0),
-            (90, 37, 0),
-            (78, 49, 0),
-            (66, 61, 0),
-            (54, 73, 0),
-            (42, 85, 0),
-            (30, 97, 0),
-            (18, 109, 0),
-            (6, 121, 0),
-            (0, 122, 5),
-            (0, 110, 17),
-            (0, 98, 29),
-            (0, 86, 41),
-            (0, 74, 53),
-            (0, 62, 65),
-            (0, 50, 77),
-            (0, 38, 89),
-            (0, 26, 101),
-            (0, 14, 113),
-            (0, 2, 125),
-            (9, 0, 118),
-            (21, 0, 106),
-            (33, 0, 94),
-            (45, 0, 82),
-            (57, 0, 70),
-            (69, 0, 58),
-            (81, 0, 46),
-            (93, 0, 34),
-            (105, 0, 22),
-            (117, 0, 10),
-        ]
-
         self.neopixel_list = []
         for i in range(num_leds):
             self.neopixel_list.append(BLACK)
@@ -164,13 +129,15 @@ class NEOPIXEL:
         :param int duration: duration in seconds: default 5 seconds
         :return: None
         """
-        start_time = time.time()
-        while time.time() - start_time < duration:
-            self.rainbow = self.rainbow[-1:] + self.rainbow[:-1]
-            for i in range(16):
-                self.neopixel_list[i] = self.rainbow[i]
-            self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(time_delta)
+        from effects import rainbow_cycle_effect
+
+        rainbow_cycle_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            time_delta,
+            duration,
+        )
 
     def chasing_color(
         self,

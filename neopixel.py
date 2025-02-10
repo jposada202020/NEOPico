@@ -400,6 +400,20 @@ class NEOPIXEL:
             duration,
         )
 
+    def pacman(self, duration: int = 5):
+        """
+        Dummy data for testing.
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import pacman_effect
+
+        pacman_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
     def twinkle(self, duration: int = 5):
         """
         Dummy data for testing.

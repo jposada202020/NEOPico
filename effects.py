@@ -16,13 +16,85 @@ Create and control LED effects.
 
 import time
 from random import choice
-
+from colors import BLACK, YELLOW, RED, PURPLE, CYAN, ORANGE, ORANGEYELLOW, BLUE
 from neopixel import NEOPIXEL
 
-BLACK = (0, 0, 0)
 
-NUM_LEDS = 64
-led_list = [BLACK for _ in range(NUM_LEDS)]
+def pacman_effect(led_object, neopixel_list, num_leds, duration: int = 15):
+    """
+    PACMAN ANIMATION Adapted from https://github.com/wled-dev/WLED/pull/4536 # by BobLoeffler68
+    MIT LICENSE
+
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int num_leds: number of leds.
+    :param int duration: duration in seconds. Default is 15 seconds
+    """
+
+    direction = 1
+    black_dir = -1
+    if num_leds > 150:
+        start_blinking_ghosts = num_leds // 4
+    else:
+        start_blinking_ghosts = num_leds // 3
+
+    pacman = [YELLOW, 10]
+    ghosts_original = [[RED, 6], [PURPLE, 4], [CYAN, 2], [ORANGE, 0]]
+    ghosts = [[RED, 6], [PURPLE, 4], [CYAN, 2], [ORANGE, 0]]
+    power_pellet = [ORANGEYELLOW, num_leds - 1]
+    neopixel_list[power_pellet[1]] = power_pellet[0]
+    NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+    ghost_timer = time.ticks_ms()
+    flag = "beep"
+
+    start_time = time.time()
+
+    while time.time() - start_time < duration:
+
+        delta = time.ticks_ms() - ghost_timer
+        if delta > 250:
+            if power_pellet[0] == ORANGEYELLOW:
+                power_pellet[0] = BLACK
+            else:
+                power_pellet[0] = ORANGEYELLOW
+
+            neopixel_list[power_pellet[1]] = power_pellet[0]
+
+            ghost_timer = time.ticks_ms()
+
+        if pacman[1] >= num_leds - 2:
+            direction = direction * -1
+            black_dir = black_dir * -1
+            for ghost in ghosts:
+                ghost[0] = BLUE
+
+        neopixel_list[pacman[1]] = pacman[0]
+        neopixel_list[pacman[1] + black_dir] = BLACK
+        pacman[1] += direction
+
+        if ghosts[3][1] <= start_blinking_ghosts and direction == -1:
+            if flag == "beep":
+                for i, ghost in enumerate(ghosts):
+                    ghost[0] = BLACK
+                flag = "bop"
+            else:
+                for i, ghost in enumerate(ghosts):
+                    ghost[0] = ghosts_original[i][0]
+                flag = "beep"
+
+        for i, ghost in enumerate(ghosts):
+            neopixel_list[ghost[1]] = ghost[0]
+            neopixel_list[ghost[1] + black_dir] = BLACK
+            ghost[1] += direction
+
+        if ghosts[3][1] <= 0:
+            direction = direction * -1
+            black_dir = black_dir * -1
+            for i, ghost in enumerate(ghosts):
+                ghost[0] = ghosts_original[i][0]
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        time.sleep(0.1)
 
 
 def rainbow_cycle_effect(

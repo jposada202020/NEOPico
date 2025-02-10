@@ -16,6 +16,7 @@ Now including rudimentary support for color palette creation
 * Led brightness:  Adapted form code from Paul Mcwhorter
 * Colorwheel: Colowheel adapted from code from Kattni Rembor for Adafruit Industries
 * Sinnousoidal color generator: Jan Bednarik https://github.com/JanBednarik/micropython-ws2812
+* Pacman Animation by BobLoeffler68 in PR wled-dev/WLED#4536
 
 
 

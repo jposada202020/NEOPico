@@ -94,3 +94,28 @@ def fade_out(segment, color: int, rate: int) -> int:
         segment.pixel_object[x] = total
 
         time.sleep(0.1)
+
+
+def lerp8by8(a, b, frac):
+    """
+    Linearly interpolate between two 8-bit values by an 8-bit fraction.
+
+    :param a: The start value (0-255)
+    :param b: The end value (0-255)
+    :param frac: The fraction (0-255)
+    :return: The interpolated value (0-255)
+    """
+    if b > a:
+        delta = b - a
+        scaled = scale8(delta, frac)
+        result = a + scaled
+    else:
+        delta = a - b
+        scaled = scale8(delta, frac)
+        result = a - scaled
+    return result
+
+
+def scale8(value, scale):
+    """Scale an 8-bit value by an 8-bit scale factor."""
+    return (value * scale) // 256

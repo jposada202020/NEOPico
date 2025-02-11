@@ -112,6 +112,8 @@ def rainbow_cycle_effect(
     :param int duration: duration in seconds: default 5 seconds
     :return: None
     """
+
+    # TODO: expose the number of colors in the palette
     from rainbow import rainbow_colors
 
     rainbow_set = rainbow_colors
@@ -133,6 +135,10 @@ def segment_effect(
     segment_length: int = 3,
     values: list = None,
 ):
+
+    # TODO: Example of how to use this function
+    # TODO: Work on logic to assign animations to segments
+
     led_list = [BLACK for _ in range(num_leds)]
 
     led_segments = get_led_segments(led_list, segment_length)
@@ -155,6 +161,10 @@ def random_color(
     :param int duration: duration in seconds. Default is 5 seconds
     """
 
+    # TODO: expose the number of colors in the palette
+    # TODO: expose the animation speed
+    # TODO: expose the color limits
+
     limits = range(0, 256)
 
     start_time = time.time()
@@ -175,6 +185,8 @@ def twinkle_effect(
     Dummy data for testing.
     :param int duration: duration in seconds. Default is 5 seconds
     """
+    # TODO: expose the number of colors in the palette
+    # TODO: expose the animation speed
 
     start_time = time.time()
 
@@ -192,6 +204,7 @@ def get_led_segments(led_list, segment_length) -> list:
 
 
 def assign_values_to_segments(segments, values) -> list:
+
     assigned_segments = []
     for i, segment in enumerate(segments):
         if i < len(values):
@@ -223,6 +236,8 @@ def rainbow_sine_effect(led_object, neopixel_list, num_leds, duration: int = 5):
     :param neopixel_list: list of neopixel colors
     :param int duration: duration in seconds. Default is 5 seconds
     """
+    # TODO: expose animation speed
+
     animation = 0
     start_time = time.time()
     while time.time() - start_time < duration:
@@ -244,6 +259,11 @@ def white_wave_effect(led_object, neopixel_list, num_leds, duration: int = 5):
     :param neopixel_list: list of neopixel colors
     :param int duration: duration in seconds. Default is 5 seconds
     """
+    # TODO: expose fade value
+    # TODO: expose animation speed
+    # TODO: expose color values based on H.
+    # TODO: verify changes in Saturation
+
     # Animation variables
     animation = 0
     fade_animation = 0
@@ -266,5 +286,127 @@ def white_wave_effect(led_object, neopixel_list, num_leds, duration: int = 5):
         # Increment animation variables
         animation += 0.08
         fade_animation += 0.08
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)
+
+
+def white_wave_color_effect(
+    led_object, neopixel_list, num_leds, duration: int = 5
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    # Animation variables
+    # TODO: Expose the saturation max and min values
+    # TODO: Expose the animation speed
+    # TODO: Expose color values based on H.
+    animation = 0
+
+    # Start time
+    start_time = time.time()
+    while time.time() - start_time < duration:
+
+        for i in range(num_leds):
+            # Calculate brightness for each LED using sine wave
+            saturation = math.sin(animation + i * 0.04)
+            saturation = (saturation + 1) / 2
+            saturation *= 255
+            saturation = max(saturation, 30)
+            saturation = saturation / 255
+
+            color = rgb255(hsv_to_rgb(0.0, saturation, 1.0))
+            neopixel_list[i] = color
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        # Increment animation variables
+        animation += 0.2
+
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)
+
+
+def lerp_effect(led_object, neopixel_list, num_leds, duration: int = 5):
+    """
+    Linear interpolation effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    from functions import lerp8by8
+
+    # TODO: give the user the option to select the base colors or select the colors from a palette
+
+    animation = 0
+    # Start time
+
+    start_time = time.time()
+    while time.time() - start_time < duration:
+
+        for i in range(num_leds):
+            # Calculate brightness for each LED using sine wave
+            interpolation = math.sin(animation + i * 0.5)
+            interpolation = (interpolation + 1) / 2
+            interpolation *= 255
+
+            color1 = (255, 216, 0)
+            color2 = (0, 150, 255)
+
+            r = lerp8by8(color1[0], color2[0], int(interpolation))
+            g = lerp8by8(color1[1], color2[1], int(interpolation))
+            b = lerp8by8(color1[2], color2[2], int(interpolation))
+
+            neopixel_list[i] = (r, g, b)
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        # Increment animation variables
+        animation += 0.1
+
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)
+
+
+def lerp_phase_effect(led_object, neopixel_list, num_leds, duration: int = 5):
+    """
+    Linear interpolation phase effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    from functions import lerp8by8
+
+    # TODO: give the user the option to select the base colors or select the colors from a palette
+
+    animation = 0
+    # Start time
+
+    start_time = time.time()
+    while time.time() - start_time < duration:
+
+        for i in range(num_leds):
+            # Calculate brightness for each LED using sine wave
+            interpolation = math.sin(i * 0.2)
+            interpolation *= 127
+
+            phase = math.sin(animation * 1.5)
+
+            interpolation *= phase
+            interpolation += 127
+
+            color1 = (255, 0, 0)
+            color2 = (0, 0, 255)
+
+            r = lerp8by8(color1[0], color2[0], int(interpolation))
+            g = lerp8by8(color1[1], color2[1], int(interpolation))
+            b = lerp8by8(color1[2], color2[2], int(interpolation))
+
+            neopixel_list[i] = (r, g, b)
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        # Increment animation variables
+        animation += 0.1
+
         # Small delay to control the speed of the animation
         time.sleep(0.01)

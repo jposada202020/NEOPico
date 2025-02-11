@@ -46,6 +46,8 @@ class NEOPIXEL:
         :return: None
 
         """
+        # TODO verify color format
+
         self.pin = pin
         self.num_leds = num_leds
         self.palette_colors = [BLACK for _ in range(self.num_leds)]
@@ -562,6 +564,48 @@ class NEOPIXEL:
         from effects import white_wave_effect
 
         white_wave_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
+    def white_wave_color(self, duration: int = 5):
+        """
+        White wave color effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import white_wave_color_effect
+
+        white_wave_color_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
+    def linear_interpolation(self, duration: int = 5):
+        """
+        Linear interpolation effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import lerp_effect
+
+        lerp_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
+    def linear_phase_interpolation(self, duration: int = 5):
+        """
+        Linear phase interpolation effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import lerp_phase_effect
+
+        lerp_phase_effect(
             self,
             self.neopixel_list,
             self.num_leds,

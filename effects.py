@@ -20,6 +20,7 @@ from colors import BLACK, YELLOW, RED, PURPLE, CYAN, ORANGE, ORANGEYELLOW, BLUE
 from neopixel import NEOPIXEL
 from palette import hsv_to_rgb
 import math
+import random
 
 
 def pacman_effect(led_object, neopixel_list, num_leds, duration: int = 15):
@@ -411,6 +412,51 @@ def lerp_phase_effect(led_object, neopixel_list, num_leds, duration: int = 5):
         NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
         # Increment animation variables
         animation += 0.1
+
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)
+
+
+def fadein_fadeout_random_color_effect(
+    led_object, neopixel_list, num_leds, duration: int = 5
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    # Animation variables
+    # TODO: Expose the saturation max and min values
+    # TODO: Expose the animation speed
+    # TODO: add the limits of color 2 and 1 to certain limits according to palette
+
+    fade = 0
+    color = 0
+    color2 = 255
+
+    # Start time
+    start_time = time.time()
+    while time.time() - start_time < duration:
+
+        for i in range(num_leds):
+            # Calculate brightness for each LED using sine wave
+
+            brightness = math.cos(fade + math.pi)
+            brightness = (brightness + 1) / 2
+
+            brightness = int(brightness * 255)
+            color_put = color, 128, brightness
+            neopixel_list[i] = color_put
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+
+        if fade >= 2 * math.pi:
+            fade = 0
+            color = random.choice(range(0, 255))
+            color2 = random.choice(range(0, 255))
+
+        # Increment animation variables
+        fade += 0.08
 
         # Small delay to control the speed of the animation
         time.sleep(0.01)

@@ -612,6 +612,20 @@ class NEOPIXEL:
             duration,
         )
 
+    def fadein_fadeout_random_color(self, duration: int = 5):
+        """
+        Fade in fade out effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import fadein_fadeout_random_color_effect
+
+        fadein_fadeout_random_color_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
 
 if __name__ == "__main__":
     ring = NEOPIXEL(Pin(15), 8)

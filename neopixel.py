@@ -414,6 +414,20 @@ class NEOPIXEL:
             duration,
         )
 
+    def rainbow_sine(self, duration: int = 5):
+        """
+        Rainbow sine data to display
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import rainbow_sine_effect
+
+        rainbow_sine_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
     def twinkle(self, duration: int = 5):
         """
         Dummy data for testing.

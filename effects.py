@@ -378,6 +378,10 @@ def lerp_phase_effect(led_object, neopixel_list, num_leds, duration: int = 5):
     from functions import lerp8by8
 
     # TODO: give the user the option to select the base colors or select the colors from a palette
+    # TODO: expose the animation speed
+    # TODO: choose random colors
+    # TODO: expose the number of colors in the palette
+    # TODO: expose the color limits
 
     animation = 0
     # Start time

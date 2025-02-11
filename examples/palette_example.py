@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025 Jose D. Montoya, DJDevon
+# SPDX-FileCopyrightText: Copyright (c) 2025 Jose D. Montoya
 #
 # SPDX-License-Identifier: MIT
 

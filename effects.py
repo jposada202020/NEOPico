@@ -18,6 +18,8 @@ import time
 from random import choice
 from colors import BLACK, YELLOW, RED, PURPLE, CYAN, ORANGE, ORANGEYELLOW, BLUE
 from neopixel import NEOPIXEL
+from palette import hsv_to_rgb
+import math
 
 
 def pacman_effect(led_object, neopixel_list, num_leds, duration: int = 15):
@@ -182,14 +184,14 @@ def twinkle_effect(
         time.sleep(0.1)
 
 
-def get_led_segments(led_list, segment_length):
+def get_led_segments(led_list, segment_length) -> list:
     segments = []
     for i in range(0, len(led_list), segment_length):
         segments.append(led_list[i : i + segment_length])
     return segments
 
 
-def assign_values_to_segments(segments, values):
+def assign_values_to_segments(segments, values) -> list:
     assigned_segments = []
     for i, segment in enumerate(segments):
         if i < len(values):
@@ -200,5 +202,36 @@ def assign_values_to_segments(segments, values):
     return assigned_segments
 
 
-def flatten_segments(assigned_segments):
+def flatten_segments(assigned_segments) -> list:
     return [led for segment in assigned_segments for led in segment]
+
+
+def rgb255(color: list):
+    """Set color of a specific LED.
+    :param list color: RGB color values
+    :return: RGB color values
+
+    """
+
+    return (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+
+
+def rainbow_sine_effect(led_object, neopixel_list, num_leds, duration: int = 5):
+    """
+    Rainbow sine wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    animation = 0
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        for i in range(num_leds):
+            hue = math.sin(animation + (i + 1) * 0.1)
+            hue = (hue + 1) / 2
+            color = rgb255(hsv_to_rgb(hue, 1.0, 1.0))
+            neopixel_list[i] = color
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        animation += 0.05
+        time.sleep(0.05)

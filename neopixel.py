@@ -554,6 +554,20 @@ class NEOPIXEL:
         else:
             raise ValueError("Palette not defined")
 
+    def white_wave(self, duration: int = 5):
+        """
+        White wave animation
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import white_wave_effect
+
+        white_wave_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
 
 if __name__ == "__main__":
     ring = NEOPIXEL(Pin(15), 8)

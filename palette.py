@@ -16,6 +16,7 @@ Palette generator for NeoPixel LED strips.
 
 
 import random
+from math import cos, pi
 
 try:
     from typing import Tuple
@@ -355,6 +356,37 @@ def generate_three_color_pastel_palette(
         color[2] = (color[2] + 255) // 2
 
     return palette
+
+
+def palette_cos(
+    t: float,
+    a: Tuple[float, float, float],
+    b: Tuple[float, float, float],
+    c: Tuple[float, float, float],
+    d: Tuple[float, float, float],
+) -> Tuple[float, float, float]:
+    """
+    Generate a color from a cosine-based palette.
+
+    :param t: Time or position parameter (0.0 to 1.0)
+    :param a: Base color offset
+    :param b: Color amplitude
+    :param c: Frequency
+    :param d: Phase
+    :return: RGB color tuple
+
+    Example usage
+    Create some example parameters for different color palettes
+    a = (0.5, 0.5, 0.5)  # base color
+    b = (0.5, 0.5, 0.5)  # amplitude
+    c = (1.0, 1.0, 1.0)  # frequency
+    d = (0.0, 0.33, 0.67)  # phase
+
+
+    """
+    return tuple(
+        a[i] + b[i] * cos(2 * pi * (c[i] * t + d[i])) for i in range(3)
+    )
 
 
 if __name__ == "__main__":

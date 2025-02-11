@@ -235,3 +235,36 @@ def rainbow_sine_effect(led_object, neopixel_list, num_leds, duration: int = 5):
         NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
         animation += 0.05
         time.sleep(0.05)
+
+
+def white_wave_effect(led_object, neopixel_list, num_leds, duration: int = 5):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    # Animation variables
+    animation = 0
+    fade_animation = 0
+    # Start time
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        # Calculate fade effect using sine wave
+        fade_effect = (math.sin(fade_animation) + 1) / 2
+        # Set global brightness based on fade effect
+        led_object.brightness = fade_effect
+        for i in range(num_leds):
+            # Calculate brightness for each LED using sine wave
+            brightness = math.sin(animation + i * 0.3)
+            brightness = (brightness + 1) / 2
+
+            color = rgb255(hsv_to_rgb(0.0, 0.0, brightness))
+            neopixel_list[i] = color
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+        # Increment animation variables
+        animation += 0.08
+        fade_animation += 0.08
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)

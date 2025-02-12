@@ -27,7 +27,6 @@ import rp2
 import time
 from math import log, e, sin
 from random import choice
-import palette
 from colors import BLACK, PURPLE
 
 

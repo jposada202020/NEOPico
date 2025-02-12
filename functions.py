@@ -119,3 +119,46 @@ def lerp8by8(a, b, frac):
 def scale8(value, scale):
     """Scale an 8-bit value by an 8-bit scale factor."""
     return (value * scale) // 256
+
+
+def rgb255(color: list):
+    """Set color of a specific LED.
+    :param list color: RGB color values
+    :return: RGB color values
+
+    """
+
+    return (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+
+
+def hsv_to_rgb(
+    hue: float, sat: float, val: float
+) -> Tuple[float, float, float]:
+    """Converts HSV to RGB values
+
+    :param float hue: The hue of the color to convert
+    :param float sat: The saturation of the color to convert
+    :param float val: The value (or brightness) of the color to convert
+    :return: RGB values
+    :rtype: Tuple[float, float, float]
+    """
+    if sat == 0.0:
+        return val, val, val
+    i = int(hue * 6.0)  # assume int() truncates!
+    hue1 = (hue * 6.0) - i
+    chroma1 = val * (1.0 - sat)
+    chroma2 = val * (1.0 - sat * hue1)
+    chroma3 = val * (1.0 - sat * (1.0 - hue1))
+    i = i % 6
+    if i == 0:
+        return val, chroma3, chroma1
+    if i == 1:
+        return chroma2, val, chroma1
+    if i == 2:
+        return chroma1, val, chroma3
+    if i == 3:
+        return chroma1, chroma2, val
+    if i == 4:
+        return chroma3, chroma1, val
+    if i == 5:
+        return val, chroma1, chroma2

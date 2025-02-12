@@ -18,7 +18,7 @@ import time
 from random import choice
 from colors import BLACK, BLUE, RED, PURPLE, CYAN, ORANGE, ORANGEYELLOW, BLUE
 from neopixel import NEOPIXEL
-from palette import hsv_to_rgb
+from functions import rgb255, hsv_to_rgb
 import math
 import random
 
@@ -252,16 +252,6 @@ def assign_values_to_segments(segments, values) -> list:
 
 def flatten_segments(assigned_segments) -> list:
     return [led for segment in assigned_segments for led in segment]
-
-
-def rgb255(color: list):
-    """Set color of a specific LED.
-    :param list color: RGB color values
-    :return: RGB color values
-
-    """
-
-    return (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
 
 
 def rainbow_sine_effect(led_object, neopixel_list, num_leds, duration: int = 5):

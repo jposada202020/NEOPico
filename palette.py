@@ -18,6 +18,7 @@ Palette generator for NeoPixel LED strips.
 import random
 from math import cos, pi
 from palettes import BlacK_Blue_Magenta_White_gp
+from effects import rgb255, hsv_to_rgb
 
 try:
     from typing import Tuple
@@ -33,7 +34,7 @@ class HarmonyType:
 
 
 class Palette:
-    def __init__(self, led_object, palette_name, base_color=None):
+    def __init__(self, led_object, palette_name=None, base_color=None):
         self.led_object = led_object
         self.palette_name = palette_name
         self.default_color_number = self.led_object.num_leds
@@ -103,7 +104,11 @@ class Palette:
             self.led_object.palette_colors = BlacK_Blue_Magenta_White_gp
 
         else:
-            self.led_object.palette_colors = None
+            a = (0.5, 0.5, 0.4)  # base color
+            b = (0.4, 0.5, 0.5)  # amplitude
+            c = (1.0, 1.0, 1.0)  # frequency
+            d = (0.0, 0.33, 0.67)  # phase
+            self.led_object.palette_colors = self.palette_cos(0.7, a, b, c, d)
 
     def create_harmony_palette(self):
         palette_data = self.generate_palette(
@@ -321,39 +326,6 @@ class Palette:
         return palette
 
 
-def hsv_to_rgb(
-    hue: float, sat: float, val: float
-) -> Tuple[float, float, float]:
-    """Converts HSV to RGB values
-
-    :param float hue: The hue of the color to convert
-    :param float sat: The saturation of the color to convert
-    :param float val: The value (or brightness) of the color to convert
-    :return: RGB values
-    :rtype: Tuple[float, float, float]
-    """
-    if sat == 0.0:
-        return val, val, val
-    i = int(hue * 6.0)  # assume int() truncates!
-    hue1 = (hue * 6.0) - i
-    chroma1 = val * (1.0 - sat)
-    chroma2 = val * (1.0 - sat * hue1)
-    chroma3 = val * (1.0 - sat * (1.0 - hue1))
-    i = i % 6
-    if i == 0:
-        return val, chroma3, chroma1
-    if i == 1:
-        return chroma2, val, chroma1
-    if i == 2:
-        return chroma1, val, chroma3
-    if i == 3:
-        return chroma1, chroma2, val
-    if i == 4:
-        return chroma3, chroma1, val
-    if i == 5:
-        return val, chroma1, chroma2
-
-
 def interpolate_color(
     start_color: list, end_color: list, factor: int
 ) -> list[int, int, int]:
@@ -410,37 +382,6 @@ def blend_colors(colors: list, num_steps: int = 8) -> list:
             blended[start_idx + j] = blended_color
 
     return blended
-
-
-def palette_cos(
-    t: float,
-    a: Tuple[float, float, float],
-    b: Tuple[float, float, float],
-    c: Tuple[float, float, float],
-    d: Tuple[float, float, float],
-) -> Tuple[float, float, float]:
-    """
-    Generate a color from a cosine-based palette.
-
-    :param t: Time or position parameter (0.0 to 1.0)
-    :param a: Base color offset
-    :param b: Color amplitude
-    :param c: Frequency
-    :param d: Phase
-    :return: RGB color tuple
-
-    Example usage
-    Create some example parameters for different color palettes
-    a = (0.5, 0.5, 0.5)  # base color
-    b = (0.5, 0.5, 0.5)  # amplitude
-    c = (1.0, 1.0, 1.0)  # frequency
-    d = (0.0, 0.33, 0.67)  # phase
-
-
-    """
-    return tuple(
-        a[i] + b[i] * cos(2 * pi * (c[i] * t + d[i])) for i in range(3)
-    )
 
 
 if __name__ == "__main__":

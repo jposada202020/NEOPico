@@ -28,13 +28,13 @@ import time
 from math import log, e, sin
 from random import choice
 import palette
+from colors import BLACK, PURPLE
+
 
 try:
     from typing import Tuple
 except ImportError:
     pass
-
-BLACK = (0, 0, 0)
 
 
 class NEOPIXEL:
@@ -50,7 +50,7 @@ class NEOPIXEL:
 
         self.pin = pin
         self.num_leds = num_leds
-        self.palette_colors = [BLACK for _ in range(self.num_leds)]
+        self.palette_colors = None
 
         self.neopixel_list = []
         for i in range(num_leds):
@@ -122,7 +122,7 @@ class NEOPIXEL:
             sideset_base=Pin(self.pin),
         )
         self.sm.active(1)
-        self.fill_all(color=(0, 0, 0))
+        self.fill_all(color=PURPLE)
 
     def rainbow_cycle(self, time_delta: float = 0.1, duration: int = 5) -> None:
         """
@@ -143,28 +143,47 @@ class NEOPIXEL:
 
     def chasing_color(
         self,
-        color: tuple = (255, 0, 0),
+        palette: list = [(255, 0, 0), (0, 255, 0), (0, 0, 255)],
         time_delta: float = 0.1,
         duration: int = 10,
     ) -> None:
         """
         Cycle through the colors in the list.
-        :param tuple color: the color to chase. Default is (255, 0, 0) i.e. red
+        :param tuple color: the color to chase. Default is [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
         :param float time_delta: time delay between each color change: default 0.1 seconds
         :param int duration: duration in seconds: default 10 seconds
         :return: None
         """
         rgb = 0
         i = 0
+        self.fill_all(color=BLACK)
         start_time = time.time()
+        if self.palette_colors is None:
+            palette = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
+        else:
+            buf = self.palette_colors
+            colors_palette = []
+            for _ in range(3):
+                selection = choice(buf)
+                colors_palette.append(selection)
+                buf.remove(selection)
+            palette = colors_palette
+
         while time.time() - start_time < duration:
+            if rgb == 0:
+                color = palette[0]
+            elif rgb == 1:
+                color = palette[1]
+            else:
+                color = palette[2]
             self.neopixel_list[i] = color
             self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(time_delta)
-            self.neopixel_list[i] = (0, 0, 0)
+            time.sleep(time_delta / 3)
+            self.neopixel_list[i] = BLACK
             self.ShowNeoPixels(self.neopixel_list)
             rgb = (rgb + 1) % 3
             i = (i + 1) % self.num_leds
+            time.sleep(time_delta)
 
     def fill_all(
         self,
@@ -179,7 +198,6 @@ class NEOPIXEL:
         :param tuple color: the color to fill. Default is (255, 0, 0) i.e. red
         :return: None
         """
-        color = color
         start_time = time.time()
         while time.time() - start_time < duration:
             # Set all pixels to the same color
@@ -191,12 +209,14 @@ class NEOPIXEL:
         self,
         color: tuple = (255, 0, 0),
         background_color: Tuple[int, int, int] = (0, 0, 0),
+        dwell: float = 0.5,
         duration: int = 5,
     ) -> None:
         """
         Blink the NeoPixels.
         :param tuple color: the color to blink. Default is (255, 0, 0) i.e. red
         :param tuple background_color: the background color. Default is (0, 0, 0) i.e. black
+        :param float dwell: time delay between each color change: default 0.5 seconds
         :param int duration: the duration in seconds. Default is 5 seconds
         :return: None
         """
@@ -204,10 +224,10 @@ class NEOPIXEL:
         while time.time() - start_time < duration:
             self.neopixel_list = [color] * self.num_leds
             self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(0.5)
+            time.sleep(dwell)
             self.neopixel_list = [background_color] * self.num_leds
             self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(0.5)
+            time.sleep(dwell)
 
     def blink_rainbow(
         self,
@@ -253,26 +273,38 @@ class NEOPIXEL:
                 self.ShowNeoPixels(self.neopixel_list)
                 time.sleep(delta_time)
 
-    def follow_rgb(self, loops: int = 3, color_list: any = None) -> None:
+    def follow_rgb(
+        self,
+        loops: int = 3,
+        color_list: any = None,
+        dwell: float = 0.2,
+        duration: int = 5,
+    ) -> None:
         """
         Follow the colors Red, White, Blue.
         :param int loops: number of loops. Default is 3
         :param list color_list: list of colors. Default is None
+        :param float dwell: time delay between each color change. Default is 0.2 seconds
+        :param int duration: duration in seconds. Default is 5 seconds
         :return: None
         """
         if color_list is None:
             color_list = [(0, 0, 0), (255, 0, 0), (127, 255, 127), (0, 0, 255)]
         reference = len(color_list)
 
-        for i in range(self.num_leds * loops):
-            for value in range(reference):
-                self.neopixel_list[(i + value) % self.num_leds] = color_list[
-                    value
-                ]
-            self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(0.2)
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            for i in range(self.num_leds * loops):
+                for value in range(reference):
+                    self.neopixel_list[(i + value) % self.num_leds] = (
+                        color_list[value]
+                    )
+                self.ShowNeoPixels(self.neopixel_list)
+                time.sleep(dwell)
 
-    def fill_custom(self, color_list: list, duration: int = 5) -> None:
+    def fill_custom(
+        self, color_list: list, dwell: float = 0.5, duration: int = 5
+    ) -> None:
         """
         Fill the NeoPixels with custom colors.
         :param list color_list: list of colors
@@ -284,7 +316,7 @@ class NEOPIXEL:
             for i in range(self.num_leds):
                 self.neopixel_list[i] = color_list[i]
             self.ShowNeoPixels(self.neopixel_list)
-            time.sleep(0.5)
+            time.sleep(dwell)
 
     def brightness(self, brightness: float = 1.0) -> None:
         """
@@ -342,6 +374,7 @@ class NEOPIXEL:
         :duration int duration: duration in seconds. Default is 5 seconds
         :return: None
         """
+        self.fill_all(color=BLACK)
         start_time = time.time()
         while time.time() - start_time < duration:
             for i in range(self.num_leds):
@@ -389,7 +422,7 @@ class NEOPIXEL:
     def random_color(self, start=0, duration: int = 5):
         """
         Random color data for testing
-        :param int num_leds: number of leds. Default is 8 leds
+        :param int start: start number. Default is 0
         :param int duration: duration in seconds. Default is 5 seconds
         """
 
@@ -493,97 +526,6 @@ class NEOPIXEL:
             values,
         )
 
-    def create_harmony_palette(
-        self,
-        palette_name: palette.HarmonyType = palette.HarmonyType.COMPLEMENTARY,
-        default_color_number=50,
-        seed: int = 1999,
-    ):
-        palette_data = palette.generate_palette(
-            temperature="neutral",
-            harmony_type=palette_name,
-            seeding=seed,
-        )
-        self.palette_colors = palette.blend_colors(
-            palette_data, default_color_number
-        )
-
-    def define_palette(
-        self,
-        palette_name: str = "harmony1",
-        default_color_number=50,
-        seed: int = 1999,
-        colors=(90, 180, 27),
-        stretch: int = 350,
-    ):
-        """
-        Define a palette based in different algorithms. Be aware that some palettes require a specific number of colors.
-        Also not all options are available for all palettes. Reading the function documentation is recommended.
-        :param str palette_name: the name of the palette. Default is "harmony1". Options are:
-         "harmony1", "harmony2", "harmony3", "harmony4", "one_color", "one_color_pastel",
-         "three_colors", "three_colors_pastel". Please refer to each function for more details.
-        :param int default_color_number: the number of default colors. Default is 50
-        :param int seed: the seed value. Default is 1999
-        :param tuple colors: the colors. Default is (90, 180, 27)
-        :param int stretch: the stretch value. Default is 350
-        :return: None
-        """
-
-        if palette_name == "harmony1":
-            self.create_harmony_palette(
-                palette.HarmonyType.COMPLEMENTARY, default_color_number, seed
-            )
-
-        elif palette_name == "harmony2":
-            self.create_harmony_palette(
-                palette.HarmonyType.ANALOGOUS, default_color_number, seed
-            )
-
-        elif palette_name == "harmony3":
-            self.create_harmony_palette(
-                palette.HarmonyType.TRIADIC, default_color_number, seed
-            )
-
-        elif palette_name == "harmony4":
-            self.create_harmony_palette(
-                palette.HarmonyType.TETRADIC, default_color_number, seed
-            )
-
-        elif palette_name == "one_color":
-            if isinstance(colors, list):
-                raise ValueError("Color list must have only one color")
-
-            self.palette_colors = palette.generate_color_palette(
-                colors, stretch, default_color_number
-            )
-
-        elif palette_name == "one_color_pastel":
-            if isinstance(colors, list):
-                raise ValueError("Color list must have only one color")
-
-            self.palette_colors = palette.generate_pastel_palette(
-                colors, stretch, default_color_number
-            )
-
-        elif palette_name == "three_colors":
-            if isinstance(colors, tuple):
-                raise ValueError("Color list must have three colors")
-
-            self.palette_colors = palette.generate_three_color_palette(
-                colors[0], colors[1], colors[2], default_color_number
-            )
-
-        elif palette_name == "three_colors_pastel":
-            if isinstance(colors, tuple):
-                raise ValueError("Color list must have three colors")
-
-            self.palette_colors = palette.generate_three_color_pastel_palette(
-                colors[0], colors[1], colors[2], default_color_number
-            )
-
-        else:
-            raise ValueError("Palette not defined")
-
     def white_wave(self, duration: int = 5):
         """
         White wave animation
@@ -676,6 +618,20 @@ class NEOPIXEL:
         from effects import fifo_fragmented_phase_effect
 
         fifo_fragmented_phase_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
+    def wave_freq_shrink_and_grow(self, duration: int = 5):
+        """
+        Wave frequency shrink and grow effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import wave_freq_shrink_and_grow_effect
+
+        wave_freq_shrink_and_grow_effect(
             self,
             self.neopixel_list,
             self.num_leds,

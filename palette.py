@@ -17,6 +17,7 @@ Palette generator for NeoPixel LED strips.
 
 import random
 from math import cos, pi
+from palettes import BlacK_Blue_Magenta_White_gp
 
 try:
     from typing import Tuple
@@ -29,6 +30,295 @@ class HarmonyType:
     TRIADIC = "triadic"
     ANALOGOUS = "analogous"
     TETRADIC = "tetradic"
+
+
+class Palette:
+    def __init__(self, led_object, palette_name, base_color=None):
+        self.led_object = led_object
+        self.palette_name = palette_name
+        self.default_color_number = self.led_object.num_leds
+        self.seed = None
+        self.stretch = None
+        self.base_color = None
+        self._harmony_type = None
+        self.base_color = base_color
+        self.define_palette()
+
+    def define_palette(
+        self,
+        seed: int = 1999,
+        stretch: int = 350,
+    ):
+        """
+        Define a palette based in different algorithms. Be aware that some palettes require a specific number of colors.
+        Also not all options are available for all palettes. Reading the function documentation is recommended.
+        :param int seed: the seed value. Default is 1999
+        :param tuple base_color: the base color. Default is (90, 180, 27)
+        :param int stretch: the stretch value. Default is 350
+        :return: None
+        """
+        self.seed = seed
+        self.stretch = stretch
+
+        if self.palette_name == "harmony1":
+            self._harmony_type = HarmonyType.COMPLEMENTARY
+            self.create_harmony_palette()
+        elif self.palette_name == "harmony2":
+            self._harmony_type = HarmonyType.ANALOGOUS
+            self.create_harmony_palette()
+        elif self.palette_name == "harmony3":
+            self._harmony_type = HarmonyType.TRIADIC
+            self.create_harmony_palette()
+        elif self.palette_name == "harmony4":
+            self._harmony_type = HarmonyType.TETRADIC
+            self.create_harmony_palette()
+
+        elif self.palette_name == "one_color":
+            if isinstance(self.base_color, list):
+                raise ValueError("Color list must have only one color")
+            self.led_object.palette_colors = self.generate_color_palette()
+
+        elif self.palette_name == "one_color_pastel":
+            if isinstance(self.base_color, list):
+                raise ValueError("Color list must have only one color")
+
+            self.palette_colors = self.generate_pastel_palette(
+                self.base_color, self.stretch, self.default_color_number
+            )
+        elif self.palette_name == "three_colors":
+            if isinstance(self.base_color, tuple):
+                raise ValueError("Color list must have three colors")
+
+            self.led_object.palette_colors = self.generate_three_color_palette()
+
+        elif self.palette_name == "three_colors_pastel":
+            if isinstance(self.base_color, tuple):
+                raise ValueError("Color list must have three colors")
+
+            self.led_object.palette_colors = (
+                self.generate_three_color_pastel_palette()
+            )
+
+        elif self.palette_name == "BlacK_Red_Magenta_Yellow_gp":
+            self.led_object.palette_colors = BlacK_Blue_Magenta_White_gp
+
+        else:
+            self.led_object.palette_colors = None
+
+    def create_harmony_palette(self):
+        palette_data = self.generate_palette(
+            temperature="neutral",
+        )
+        self.led_object.palette_colors = blend_colors(
+            palette_data, self.default_color_number
+        )
+
+    def generate_palette(
+        self,
+        temperature: str = "neutral",
+    ) -> list:
+        """Generate a complete color palette with analysis
+        :param str temperature: Temperature preference. Options are "warm", "cool", or "neutral". Default is "neutral
+        :return: List of colors in the palette
+        :rtype: list
+        """
+        random.seed(self.seed)
+        """Generate a complete color palette with analysis"""
+        base_color = self.generate_base_color(temperature)
+
+        colors = self.generate_harmony(
+            base_color, self._harmony_type, self.default_color_number
+        )
+        colors_rgb = []
+
+        for color in colors:
+            rgb = hsv_to_rgb(*color)
+
+            colors_rgb.append(
+                (int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
+            )
+
+        return colors_rgb
+
+    def generate_harmony(
+        self,
+        base_color: Tuple[float, float, float],
+        harmony_type: HarmonyType,
+        num_colors: int = 5,
+    ):
+        """Generate a color harmony based on the specified type
+        :param Tuple[float, float, float] base_color: Base color in HSV format
+        :param int num_colors: Number of colors in the harmony. Default is 5
+        :return: List of colors in the harmony
+        :rtype: list
+        """
+        colors = [base_color]
+
+        if harmony_type == HarmonyType.COMPLEMENTARY:
+            complementary = self.adjust_color(base_color, hue_shift=0.5)
+            colors.append(complementary)
+
+        if harmony_type == HarmonyType.TRIADIC:
+            colors.extend(
+                [
+                    self.adjust_color(base_color, hue_shift=1 / 3),
+                    self.adjust_color(base_color, hue_shift=2 / 3),
+                ]
+            )
+
+        if harmony_type == HarmonyType.ANALOGOUS:
+            for i in range(1, num_colors):
+                shift = 0.05 * i
+                colors.append(self.adjust_color(base_color, hue_shift=shift))
+
+        if harmony_type == HarmonyType.TETRADIC:
+            colors.extend(
+                [
+                    self.adjust_color(base_color, hue_shift=0.25),
+                    self.adjust_color(base_color, hue_shift=0.5),
+                    self.adjust_color(base_color, hue_shift=0.75),
+                ]
+            )
+
+        return colors
+
+    def generate_base_color(
+        self,
+        temperature: str = "neutral",
+    ) -> Tuple[float, float, float]:
+        """Generate a base color with given temperature preference
+        :param str temperature: Temperature preference. Options are "warm", "cool", or "neutral". Default is "neutral"
+        :return: Base color in HSV format
+        :rtype: Tuple[float, float, float]
+        """
+        if temperature == "warm":
+            h = random.uniform(0.95, 0.15)  # Red to Yellow
+        elif temperature == "cool":
+            h = random.uniform(0.45, 0.65)  # Green to Blue
+        else:
+            h = random.random()
+
+        s = random.uniform(0.6, 0.9)  # Medium to high saturation
+        v = random.uniform(0.7, 0.9)  # Medium to high value
+
+        return h, s, v
+
+    def adjust_color(
+        self,
+        color: Tuple[float, float, float],
+        hue_shift: float = 0.0,
+        sat_adjust: float = 0.0,
+        val_adjust: float = 0.0,
+    ) -> Tuple[float, float, float]:
+        """Adjust a color's HSV values
+        :param Tuple[float, float, float] color: Color to adjust
+        :param float hue_shift: Hue shift value. Default is 0.0
+        :param float sat_adjust: Saturation adjustment value. Default is 0.0
+        :param float val_adjust: Value adjustment value. Default is 0.0
+        :return: Adjusted color in HSV format
+        :rtype: Tuple[float, float, float]
+        """
+        h, s, v = color
+
+        """Adjust a color's HSV values"""
+        new_h = (h + hue_shift) % 1.0
+        new_s = self.clip(s + sat_adjust, 0, 1)
+        new_v = self.clip(v + val_adjust, 0, 1)
+
+        return new_h, new_s, new_v
+
+    def clip(self, value: float, min_value: float, max_value: float) -> float:
+        """Clips a value between a minimum and maximum value
+        :param float value: Value to clip
+        :param float min_value: Minimum value
+        :param float max_value: Maximum value
+        :return: Clipped value
+        :rtype: float
+        """
+        return max(min(value, max_value), min_value)
+
+    def generate_color_palette(self) -> list:
+        """Generate a color palette based on a base color
+        :return: List of colors in the palette
+        :rtype: list
+        """
+        palette = []
+        base_r, base_g, base_b = self.base_color
+
+        for i in range(self.default_color_number):
+            r = (base_r + (i * self.stretch) % 256) % 256
+            g = (base_g + ((i * self.stretch) // 2) % 256) % 256
+            b = (base_b + ((i * self.stretch) // 3) % 256) % 256
+            palette.append((r, g, b))
+
+        return palette
+
+    def generate_pastel_palette(self) -> list:
+        """Generate a pastel color palette based on a base color
+        :return: List of pastel colors in the palette
+        :rtype: list
+        """
+        palette = []
+        base_r, base_g, base_b = self.base_color
+
+        for i in range(self.default_color_number):
+            r = (base_r + i * self.stretch) % 256
+            g = (base_g + i * self.stretch) % 256
+            b = (base_b + i * self.stretch) % 256
+
+            # Mix with white to create pastel colors
+            r = (r + 255) // 2
+            g = (g + 255) // 2
+            b = (b + 255) // 2
+
+            palette.append((r, g, b))
+
+        return palette
+
+    def generate_three_color_palette(self) -> list:
+        """Generate a three-color palette
+        :return: List of colors in the palette
+        :rtype: list
+        """
+        palette = []
+        segment_size = self.default_color_number // 2
+
+        # Interpolate between color1 and color2
+        for i in range(segment_size):
+            factor = i / segment_size
+            palette.append(
+                interpolate_color_p(
+                    self.base_color[0], self.base_color[1], factor
+                )
+            )
+
+        # Interpolate between color2 and color3
+        for i in range(segment_size):
+            factor = i / segment_size
+            palette.append(
+                interpolate_color_p(
+                    self.base_color[1], self.base_color[2], factor
+                )
+            )
+
+        return palette
+
+    def generate_three_color_pastel_palette(
+        self,
+    ) -> list:
+        """Generate a pastel three-color palette
+        :return: List of pastel colors in the palette
+        :rtype: list
+        """
+        palette = self.generate_three_color_palette()
+
+        # Mix each color with white to create pastel colors
+        for color in palette:
+            color[0] = (color[0] + 255) // 2
+            color[1] = (color[1] + 255) // 2
+            color[2] = (color[2] + 255) // 2
+
+        return palette
 
 
 def hsv_to_rgb(
@@ -122,241 +412,6 @@ def blend_colors(colors: list, num_steps: int = 8) -> list:
     return blended
 
 
-def generate_base_color(
-    temperature: str = "neutral",
-) -> Tuple[float, float, float]:
-    """Generate a base color with given temperature preference
-    :param str temperature: Temperature preference. Options are "warm", "cool", or "neutral". Default is "neutral"
-    :return: Base color in HSV format
-    :rtype: Tuple[float, float, float]
-    """
-    if temperature == "warm":
-        h = random.uniform(0.95, 0.15)  # Red to Yellow
-    elif temperature == "cool":
-        h = random.uniform(0.45, 0.65)  # Green to Blue
-    else:
-        h = random.random()
-
-    s = random.uniform(0.6, 0.9)  # Medium to high saturation
-    v = random.uniform(0.7, 0.9)  # Medium to high value
-
-    return h, s, v
-
-
-def clip(value: float, min_value: float, max_value: float) -> float:
-    """Clips a value between a minimum and maximum value
-    :param float value: Value to clip
-    :param float min_value: Minimum value
-    :param float max_value: Maximum value
-    :return: Clipped value
-    :rtype: float
-    """
-    return max(min(value, max_value), min_value)
-
-
-def adjust_color(
-    color: Tuple[float, float, float],
-    hue_shift: float = 0.0,
-    sat_adjust: float = 0.0,
-    val_adjust: float = 0.0,
-) -> Tuple[float, float, float]:
-    """Adjust a color's HSV values
-    :param Tuple[float, float, float] color: Color to adjust
-    :param float hue_shift: Hue shift value. Default is 0.0
-    :param float sat_adjust: Saturation adjustment value. Default is 0.0
-    :param float val_adjust: Value adjustment value. Default is 0.0
-    :return: Adjusted color in HSV format
-    :rtype: Tuple[float, float, float]
-    """
-    h, s, v = color
-
-    """Adjust a color's HSV values"""
-    new_h = (h + hue_shift) % 1.0
-    new_s = clip(s + sat_adjust, 0, 1)
-    new_v = clip(v + val_adjust, 0, 1)
-
-    return new_h, new_s, new_v
-
-
-def generate_harmony(
-    base_color: Tuple[float, float, float],
-    harmony_type: HarmonyType,
-    num_colors: int = 5,
-):
-    """Generate a color harmony based on the specified type
-    :param Tuple[float, float, float] base_color: Base color in HSV format
-    :param HarmonyType harmony_type: Type of harmony to generate
-    :param int num_colors: Number of colors in the harmony. Default is 5
-    :return: List of colors in the harmony
-    :rtype: list
-    """
-    colors = [base_color]
-
-    if harmony_type == HarmonyType.COMPLEMENTARY:
-        complementary = adjust_color(base_color, hue_shift=0.5)
-        colors.append(complementary)
-
-    if harmony_type == HarmonyType.TRIADIC:
-        colors.extend(
-            [
-                adjust_color(base_color, hue_shift=1 / 3),
-                adjust_color(base_color, hue_shift=2 / 3),
-            ]
-        )
-
-    if harmony_type == HarmonyType.ANALOGOUS:
-        for i in range(1, num_colors):
-            shift = 0.05 * i
-            colors.append(adjust_color(base_color, hue_shift=shift))
-
-    if harmony_type == HarmonyType.TETRADIC:
-        colors.extend(
-            [
-                adjust_color(base_color, hue_shift=0.25),
-                adjust_color(base_color, hue_shift=0.5),
-                adjust_color(base_color, hue_shift=0.75),
-            ]
-        )
-
-    return colors
-
-
-def generate_palette(
-    temperature: str = "neutral",
-    harmony_type: HarmonyType = HarmonyType.COMPLEMENTARY,
-    num_colors: int = 5,
-    seeding=42,
-) -> list:
-    """Generate a complete color palette with analysis
-    :param str temperature: Temperature preference. Options are "warm", "cool", or "neutral". Default is "neutral
-    :param HarmonyType harmony_type: Type of harmony to generate. Default is HarmonyType.COMPLEMENTARY
-    :param int num_colors: Number of colors in the palette. Default is 5
-    :param int seeding: Random seed value. Default is 42
-    :return: List of colors in the palette
-    :rtype: list
-    """
-    random.seed(seeding)
-    """Generate a complete color palette with analysis"""
-    base_color = generate_base_color(temperature)
-
-    colors = generate_harmony(base_color, harmony_type, num_colors)
-    colors_rgb = []
-
-    for color in colors:
-        rgb = hsv_to_rgb(*color)
-
-        colors_rgb.append(
-            (int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
-        )
-
-    return colors_rgb
-
-
-def generate_color_palette(
-    base_color: list, stretch: int, num_colors: int = 12
-) -> list:
-    """Generate a color palette based on a base color
-    :param list base_color: Base color in RGB format
-    :param int stretch: Stretch factor for the color palette
-    :param int num_colors: Number of colors in the palette. Default is 12
-    :return: List of colors in the palette
-    :rtype: list
-    """
-    palette = []
-    base_r, base_g, base_b = base_color
-
-    for i in range(num_colors):
-        r = (base_r + (i * stretch) % 256) % 256
-        g = (base_g + ((i * stretch) // 2) % 256) % 256
-        b = (base_b + ((i * stretch) // 3) % 256) % 256
-        palette.append((r, g, b))
-
-    return palette
-
-
-def generate_pastel_palette(
-    base_color: list, stretch: int, num_colors=12
-) -> list:
-    """Generate a pastel color palette based on a base color
-    :param list base_color: Base color in RGB format
-    :param int stretch: Stretch factor for the color palette
-    :param int num_colors: Number of colors in the palette. Default is 12
-    :return: List of pastel colors in the palette
-    :rtype: list
-    """
-    palette = []
-    base_r, base_g, base_b = base_color
-
-    for i in range(num_colors):
-        r = (base_r + i * stretch) % 256
-        g = (base_g + i * stretch) % 256
-        b = (base_b + i * stretch) % 256
-
-        # Mix with white to create pastel colors
-        r = (r + 255) // 2
-        g = (g + 255) // 2
-        b = (b + 255) // 2
-
-        palette.append((r, g, b))
-
-    return palette
-
-
-def generate_three_color_palette(
-    color1: Tuple[int, int, int],
-    color2: Tuple[int, int, int],
-    color3: Tuple[int, int, int],
-    num_colors: int = 16,
-) -> list:
-    """Generate a three-color palette
-    :param Tuple[int, int, int] color1: First color in RGB format
-    :param Tuple[int, int, int] color2: Second color in RGB format
-    :param Tuple[int, int, int] color3: Third color in RGB format
-    :param int num_colors: Number of colors in the palette. Default is 16
-    :return: List of colors in the palette
-    :rtype: list
-    """
-    palette = []
-    segment_size = num_colors // 2
-
-    # Interpolate between color1 and color2
-    for i in range(segment_size):
-        factor = i / segment_size
-        palette.append(interpolate_color_p(color1, color2, factor))
-
-    # Interpolate between color2 and color3
-    for i in range(segment_size):
-        factor = i / segment_size
-        palette.append(interpolate_color_p(color2, color3, factor))
-
-    return palette
-
-
-def generate_three_color_pastel_palette(
-    color1: Tuple[int, int, int],
-    color2: Tuple[int, int, int],
-    color3: Tuple[int, int, int],
-    num_colors: int = 16,
-) -> list:
-    """Generate a pastel three-color palette
-    :param Tuple[int, int, int] color1: First color in RGB format
-    :param Tuple[int, int, int] color2: Second color in RGB format
-    :param Tuple[int, int, int] color3: Third color in RGB format
-    :param int num_colors: Number of colors in the palette. Default is 16
-    :return: List of pastel colors in the palette
-    :rtype: list
-    """
-    palette = generate_three_color_palette(color1, color2, color3, num_colors)
-
-    # Mix each color with white to create pastel colors
-    for color in palette:
-        color[0] = (color[0] + 255) // 2
-        color[1] = (color[1] + 255) // 2
-        color[2] = (color[2] + 255) // 2
-
-    return palette
-
-
 def palette_cos(
     t: float,
     a: Tuple[float, float, float],
@@ -389,7 +444,4 @@ def palette_cos(
 
 
 if __name__ == "__main__":
-    colors = generate_palette(harmony_type=HarmonyType.TRIADIC, seeding=42)
-
-    # Blend the colors and create a list of 16 colors
-    blended = blend_colors(colors, 8)
+    pass

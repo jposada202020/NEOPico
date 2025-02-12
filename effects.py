@@ -16,7 +16,7 @@ Create and control LED effects.
 
 import time
 from random import choice
-from colors import BLACK, YELLOW, RED, PURPLE, CYAN, ORANGE, ORANGEYELLOW, BLUE
+from colors import BLACK, BLUE, RED, PURPLE, CYAN, ORANGE, ORANGEYELLOW, BLUE
 from neopixel import NEOPIXEL
 from palette import hsv_to_rgb
 import math
@@ -41,7 +41,7 @@ def pacman_effect(led_object, neopixel_list, num_leds, duration: int = 15):
     else:
         start_blinking_ghosts = num_leds // 3
 
-    pacman = [YELLOW, 10]
+    pacman = [BLUE, 10]
     ghosts_original = [[RED, 6], [PURPLE, 4], [CYAN, 2], [ORANGE, 0]]
     ghosts = [[RED, 6], [PURPLE, 4], [CYAN, 2], [ORANGE, 0]]
     power_pellet = [ORANGEYELLOW, num_leds - 1]
@@ -169,7 +169,7 @@ def segment_animated_effect(
     led_list = [BLACK for _ in range(num_leds)]
 
     led_segments = get_led_segments(led_list, segment_length)
-    print(neopixel_list)
+
     random_color(led_object, neopixel_list, 3, duration)
 
     # assigned_segments = assign_values_to_segments(led_segments, values)
@@ -202,7 +202,7 @@ def random_color(
     limits = range(0, 256)
 
     start_time = time.time()
-    print(neopixel_list)
+
     while time.time() - start_time < duration:
 
         for i in range(start, num_leds):
@@ -224,7 +224,9 @@ def twinkle_effect(
     start_time = time.time()
 
     while time.time() - start_time < duration:
-        neopixel_list = [choice(palette_colors) for _ in range(num_leds)]
+        neopixel_list = [
+            choice(led_object.palette_colors) for _ in range(num_leds)
+        ]
         NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
         time.sleep(0.1)
 

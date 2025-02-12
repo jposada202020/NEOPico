@@ -598,3 +598,44 @@ def fifo_fragmented_phase_effect(
 
         # Small delay to control the speed of the animation
         time.sleep(0.01)
+
+
+def wave_freq_shrink_and_grow_effect(
+    led_object, neopixel_list, num_leds, duration: int = 5
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    # Animation variables
+    # TODO: Expose the saturation max and min values
+    # TODO: Expose the animation speed
+    # TODO: add the limits of color 2 and 1 to certain limits according to palette
+    # TODO: improve segment verification according to the number of leds
+    move = 0
+    freq = 0
+
+    # Start time
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        shrinkage = math.sin(freq)
+        shrinkage = (shrinkage + 1) / 2
+
+        for i in range(num_leds):
+            # Calculate brightness for each LED using sine wave
+            saturation = math.sin(move + i * shrinkage)
+            saturation = (saturation + 1) / 2
+            saturation = int(saturation * 255)
+            saturation = max(saturation, 30)
+            color_put = 170, saturation, 255
+            neopixel_list[i] = color_put
+
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+
+        move += 0.2
+        freq += 0.003
+
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)

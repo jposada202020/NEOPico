@@ -153,8 +153,41 @@ def segment_effect(
         time.sleep(0.1)
 
 
+def segment_animated_effect(
+    led_object,
+    neopixel_list,
+    num_leds,
+    duration: int = 5,
+    segment_length: int = 3,
+    values: list = None,
+    animation=None,
+):
+
+    # TODO: Example of how to use this function
+    # TODO: Work on logic to assign animations to segments
+
+    led_list = [BLACK for _ in range(num_leds)]
+
+    led_segments = get_led_segments(led_list, segment_length)
+    print(neopixel_list)
+    random_color(led_object, neopixel_list, 3, duration)
+
+    # assigned_segments = assign_values_to_segments(led_segments, values)
+    # neopixel_list = flatten_segments(assigned_segments)
+
+    # start_time = time.time()
+
+    # while time.time() - start_time < duration:
+    #     NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+    #     time.sleep(0.1)
+
+
 def random_color(
-    led_object, neopixel_list, num_leds: int = 8, duration: int = 5
+    led_object,
+    neopixel_list,
+    start: int = 0,
+    num_leds: int = 8,
+    duration: int = 5,
 ):
     """
     Random color data for testing
@@ -169,12 +202,11 @@ def random_color(
     limits = range(0, 256)
 
     start_time = time.time()
-
+    print(neopixel_list)
     while time.time() - start_time < duration:
-        neopixel_list = [
-            (choice(limits), choice(limits), choice(limits))
-            for _ in range(num_leds)
-        ]
+
+        for i in range(start, num_leds):
+            neopixel_list[i] = (choice(limits), choice(limits), choice(limits))
         NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
         time.sleep(0.1)
 
@@ -457,6 +489,112 @@ def fadein_fadeout_random_color_effect(
 
         # Increment animation variables
         fade += 0.08
+
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)
+
+
+def fadein_fadeout_fragmented_effect(
+    led_object, neopixel_list, num_leds, duration: int = 5
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    # Animation variables
+    # TODO: Expose the saturation max and min values
+    # TODO: Expose the animation speed
+    # TODO: add the limits of color 2 and 1 to certain limits according to palette
+    # TODO: improve segment verification according to the number of leds
+
+    fade = 0
+    color = 0
+    fragments = 1
+    fragment_size = math.ceil(num_leds / fragments)
+
+    fragment = 0
+
+    # Start time
+    start_time = time.time()
+    while time.time() - start_time < duration:
+
+        for i in range(
+            fragment * fragment_size, fragment_size * (fragment + 1)
+        ):
+            # Calculate brightness for each LED using sine wave
+
+            brightness = math.cos(fade + math.pi)
+            brightness = (brightness + 1) / 2
+
+            brightness = int(brightness * 255)
+            color_put = color, 255, brightness
+            neopixel_list[i] = color_put
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
+
+        if fade >= 2 * math.pi:
+            fade = 0
+            color = random.choice(range(0, 255))
+            fragment = fragment + 1
+            fragment = fragment % fragments
+
+        # Increment animation variables
+        fade += 0.08
+
+        # Small delay to control the speed of the animation
+        time.sleep(0.01)
+
+
+def fifo_fragmented_phase_effect(
+    led_object, neopixel_list, num_leds, duration: int = 5
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param neopixel_list: list of neopixel colors
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+    # Animation variables
+    # TODO: Expose the saturation max and min values
+    # TODO: Expose the animation speed
+    # TODO: add the limits of color 2 and 1 to certain limits according to palette
+    # TODO: improve segment verification according to the number of leds
+
+    fade = 0
+
+    fragment_amount = 1
+    fragment_size = math.floor(num_leds / fragment_amount)
+
+    # Start time
+    start_time = time.time()
+    while time.time() - start_time < duration:
+
+        for i in range(fragment_amount):
+            # Calculate brightness for each LED using cosine wave
+            brightness = math.cos(fade + (math.pi // 2 * i))
+            brightness = (brightness + 1) / 2
+            brightness = int(brightness * 255)
+
+            # Set color for each LED
+            begin = i * fragment_size
+            end = min(fragment_size * (i + 1), num_leds)
+            for j in range(begin, end):
+                neopixel_list[j] = 0, 0, brightness
+
+        fade += 0.03
+
+        if fade >= 20:
+            fade = 0
+            if fragment_amount >= 8:
+                fragment_amount = 1
+            fragment_amount *= 2
+            fragment_size = math.ceil(num_leds / fragment_amount)
+
+            led_object.fill_all(color=(0, 0, 0))
+
+        # Increment animation variables
+        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
 
         # Small delay to control the speed of the animation
         time.sleep(0.01)

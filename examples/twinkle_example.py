@@ -6,8 +6,8 @@
 from neopixel import NEOPIXEL
 from machine import Pin
 
-# Create a NeoPixel strip with 8 pixels connected to pin 15
-led_strip = NEOPIXEL(Pin(15), 8)
+# Create a NeoPixel strip with 30 pixels connected to pin 15
+led_strip = NEOPIXEL(Pin(15), 30)
 
 # Define a palette with three pastel colors
 colors = [(90, 180, 27), (111, 123, 154), (231, 45, 120)]

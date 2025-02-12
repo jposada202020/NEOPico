@@ -386,7 +386,7 @@ class NEOPIXEL:
                 self.ShowNeoPixels(data)
                 time.sleep(dwell)
 
-    def random_color(self, num_leds: int = 8, duration: int = 5):
+    def random_color(self, start=0, duration: int = 5):
         """
         Random color data for testing
         :param int num_leds: number of leds. Default is 8 leds
@@ -398,6 +398,7 @@ class NEOPIXEL:
         random_color(
             self,
             self.neopixel_list,
+            start,
             self.num_leds,
             duration,
         )
@@ -445,11 +446,39 @@ class NEOPIXEL:
             duration,
         )
 
+    def segment_animated(
+        self,
+        segment_length: int,
+        values: list,
+        duration: int = 5,
+        animation: str = "fade",
+    ):
+        """
+        Get led segments
+        :param int segment_length: the segment length
+        :param list values: the values
+        :param int duration: duration in seconds. Default is 5 seconds
+        :return: the segments
+        """
+
+        from effects import segment_animated_effect
+
+        segment_animated_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+            segment_length,
+            values,
+            animation,
+        )
+
     def segment(self, segment_length: int, values: list, duration: int = 5):
         """
         Get led segments
         :param int segment_length: the segment length
         :param list values: the values
+        :param int duration: duration in seconds. Default is 5 seconds
         :return: the segments
         """
 
@@ -457,7 +486,6 @@ class NEOPIXEL:
 
         segment_effect(
             self,
-            self.palette_colors,
             self.neopixel_list,
             self.num_leds,
             duration,
@@ -620,6 +648,34 @@ class NEOPIXEL:
         from effects import fadein_fadeout_random_color_effect
 
         fadein_fadeout_random_color_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
+    def fadein_fadeout_fragmented(self, duration: int = 5):
+        """
+        Fade in fade out fragmented effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import fadein_fadeout_fragmented_effect
+
+        fadein_fadeout_fragmented_effect(
+            self,
+            self.neopixel_list,
+            self.num_leds,
+            duration,
+        )
+
+    def fifo_fragmented_phase(self, duration: int = 5):
+        """
+        FIFO fragmented effect
+        :param int duration: duration in seconds. Default is 5 seconds
+        """
+        from effects import fifo_fragmented_phase_effect
+
+        fifo_fragmented_phase_effect(
             self,
             self.neopixel_list,
             self.num_leds,

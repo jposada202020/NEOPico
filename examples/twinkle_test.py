@@ -7,7 +7,7 @@ from neopixel import NEOPIXEL
 from machine import Pin
 
 
-led_strip = NEOPIXEL(Pin(15), 8)
+led_strip = NEOPIXEL(Pin(15), 30)
 colors = (80, 0, 80)
 led_strip.define_palette("one_color", colors=colors)
 

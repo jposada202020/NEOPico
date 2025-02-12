@@ -248,7 +248,6 @@ def generate_palette(
         colors_rgb.append(
             (int(rgb[0] * 255), int(rgb[1] * 255), int(rgb[2] * 255))
         )
-    print(colors_rgb)
 
     return colors_rgb
 

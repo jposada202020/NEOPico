@@ -6,7 +6,7 @@
 from neopixel import NEOPIXEL
 from machine import Pin
 
-# Create a NeoPixel strip with 8 pixels connected to pin 15
+# Create a NeoPixel strip with 50 pixels connected to pin 15
 led_strip = NEOPIXEL(Pin(15), 50)
 
 # Fill the strip with black (0, 0, 0) to start

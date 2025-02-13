@@ -5,12 +5,13 @@
 
 from neopixel import NEOPIXEL
 from machine import Pin
+from effects import rainbow_cycle
 
 # Create a NeoPixel strip with 30 pixels connected to pin 15
 led_strip = NEOPIXEL(Pin(15), 30)
 
 # Create a rainbow cycle animation for 5 seconds
-led_strip.rainbow_cycle(duration=5)
+rainbow_cycle(led_strip, duration=5)
 
 # Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

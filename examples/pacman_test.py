@@ -5,6 +5,7 @@
 
 from neopixel import NEOPIXEL
 from machine import Pin
+from effects import pacman
 
 # Create a NeoPixel strip with 50 pixels connected to pin 15
 led_strip = NEOPIXEL(Pin(15), 50)
@@ -13,4 +14,4 @@ led_strip = NEOPIXEL(Pin(15), 50)
 led_strip.fill_all(color=(0, 0, 0))
 
 # Pacman animation
-led_strip.pacman(30)
+pacman(led_strip, 30)

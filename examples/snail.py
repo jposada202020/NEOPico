@@ -13,5 +13,5 @@ led_strip = NEOPIXEL(Pin(15), 30)
 # Create a rainbow cycle animation for 15 seconds
 snail(led_strip, duration=35)
 
-And if it is manuel, # Turn off all the pixels
+# Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

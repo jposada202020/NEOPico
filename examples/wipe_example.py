@@ -12,7 +12,14 @@ from effects import wipe
 led_strip = NEOPIXEL(Pin(15), 30)
 
 # Define the blink colors
-wipe(led_strip, color1=PURPLE, color2=BLUE, delta_time=0.2, duration=5)
+wipe(
+    led_strip,
+    color1=PURPLE,
+    color2=BLUE,
+    delta_time=0.2,
+    clear=True,
+    duration=15,
+)
 
 # Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

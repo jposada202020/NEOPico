@@ -11,7 +11,9 @@ from effects import fadein_fadeout_fragmented
 led_strip = NEOPIXEL(Pin(15), 30)
 
 # Create a rainbow cycle animation for 5 seconds
-fadein_fadeout_fragmented(led_strip, fragments=4,fade_increment=0.08, speed=0.1,duration=155)
+fadein_fadeout_fragmented(
+    led_strip, fragments=4, fade_increment=0.08, speed=0.1, duration=155
+)
 
 # Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

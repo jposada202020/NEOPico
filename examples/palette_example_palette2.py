@@ -26,5 +26,3 @@ Palette(led_strip, "one_color", base_color=base_color)
 blended_complementary = blend_colors(led_strip.palette_colors, 30)
 led_strip.fill_custom(blended_complementary)
 led_strip.fill_all(color=(0, 0, 0))
-
-

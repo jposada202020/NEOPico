@@ -5,10 +5,13 @@
 import palette
 from neopixel import NEOPIXEL
 from machine import Pin
+from palette import Palette
 from effects import follow_rgb
 
 # Create a NeoPixel ring with 30 pixels connected to pin 15
 led_strip = NEOPIXEL(Pin(15), 30)
+
+Palette(led_strip, "harmony3")
 
 # Define the blink colors
 follow_rgb(led_strip)

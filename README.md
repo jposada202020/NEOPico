@@ -17,6 +17,7 @@ Now including rudimentary support for color palette creation
 * Colorwheel: Colowheel adapted from code from Kattni Rembor for Adafruit Industries
 * Sinnousoidal color generator: Jan Bednarik https://github.com/JanBednarik/micropython-ws2812
 * Pacman Animation by BobLoeffler68 in PR wled-dev/WLED#4536
+* Other Animations adapted from the Arduino animations from Ernest Warzocha https://github.com/ErniW/Arduino-Neopixels-animations
 
 
 

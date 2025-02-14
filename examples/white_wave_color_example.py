@@ -10,8 +10,8 @@ from effects import white_wave_color
 # Create a NeoPixel strip with 30 pixels connected to pin 15
 led_strip = NEOPIXEL(Pin(15), 30)
 
-# Create a rainbow cycle animation for 5 seconds
-white_wave_color(led_strip, duration=155)
+# Create a rainbow cycle animation for 35 seconds
+white_wave_color(led_strip, duration=35)
 
 # Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

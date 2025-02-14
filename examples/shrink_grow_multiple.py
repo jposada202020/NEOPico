@@ -11,7 +11,9 @@ from effects import shrink_and_grow_multiple
 led_strip = NEOPIXEL(Pin(15), 30)
 
 # Create a rainbow cycle animation for 15 seconds
-shrink_and_grow_multiple(led_strip, duration=15)
+shrink_and_grow_multiple(
+    led_strip, fragment_amount=2, move_increase=0.05, speed=0.2, duration=55
+)
 
 # Turn off all the pixels
 led_strip.fill_all(color=(0, 0, 0))

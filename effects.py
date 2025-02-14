@@ -1009,25 +1009,34 @@ def shrink_and_grow(led_object, duration: int = 5):
             move = 0
 
 
-def shrink_and_grow_multiple(led_object, duration: int = 5):
+def shrink_and_grow_multiple(
+    led_object,
+    fragment_amount: int = 4,
+    move_increase: float = 0.08,
+    speed: float = 0.01,
+    duration: int = 5,
+):
     """
     White wave effect.
     :param led_object: led object
+    :param int fragment_amount: number of fragments. Default is 4
+    :param float move_increase: move increase value. Default is 0.08. This value will control the
+        speed of the move
+    :param float speed: speed of the animation. Default is 0.01 seconds. This value will control
+        how often the animation is updated. You can fin tune animation increase and speed to get the
+        desired effect
     :param int duration: duration in seconds. Default is 5 seconds
     """
-    # TODO: Expose the animation speed
-    # TODO: add the limits of color 2 and 1 to certain limits according to palette
-    # TODO: improve segment verification according to the number of leds
+
     move = 0
 
-    fragment_amount = 4
     fragment_size = led_object.num_leds // fragment_amount
     fragment_midpoint = fragment_size // 2
 
     spread = fragment_midpoint * ((math.sin(move) + 1) / 2)
     step = math.pi / spread
-    led_object.fill_all(color=(0, 0, 0))
-    # Start time
+    led_object.fill_all(color=(BLACK))
+
     start_time = time.time()
     while time.time() - start_time < duration:
 
@@ -1040,32 +1049,44 @@ def shrink_and_grow_multiple(led_object, duration: int = 5):
                 brigthness = (brigthness + 1) / 2
                 brigthness = int(brigthness * 255)
 
-                led_object.neopixel_list[midpoint + i] = 0, 0, brigthness
-                led_object.neopixel_list[midpoint - i] = 0, 0, brigthness
+                led_object.neopixel_list[midpoint + i] = 25, brigthness, 80
+                led_object.neopixel_list[midpoint - i] = 80, brigthness, 25
 
         NEOPIXEL.ShowNeoPixels(led_object, led_object.neopixel_list)
 
-        move += 0.08
+        move += move_increase
 
         # Small delay to control the speed of the animation
-        time.sleep(0.01)
+        time.sleep(speed)
         if move >= 2 * math.pi:
             move = 0
             pos = 0
 
 
-def shrink_and_grow_multiple_moving(led_object, duration: int = 5):
+def shrink_and_grow_multiple_moving(
+    led_object,
+    fragment_amount: int = 4,
+    midpoint_increase: float = 0.05,
+    move_increase: float = 0.05,
+    speed: float = 0.01,
+    duration: int = 5,
+):
     """
     White wave effect.
     :param led_object: led object
+    :param int fragment_amount: number of fragments. Default is 4
+    :param float midpoint_increase: midpoint increase value. Default is 0.05. This value will control the
+        speed of the move
+    :param float move_increase: move increase value. Default is 0.05. This value will control the
+        speed of the move
+    :param float speed: speed of the animation. Default is 0.01 seconds. This value will control
+        how often the animation is updated. You can fin tune animation increase and speed to get the
+        desired effect
     :param int duration: duration in seconds. Default is 5 seconds
     """
-    # TODO: Expose the animation speed
-    # TODO: add the limits of color 2 and 1 to certain limits according to palette
-    # TODO: improve segment verification according to the number of leds
+
     move = 0
 
-    fragment_amount = 4
     midpoint = [0] * fragment_amount
 
     leds = [(0, 0, 0)] * led_object.num_leds
@@ -1079,12 +1100,11 @@ def shrink_and_grow_multiple_moving(led_object, duration: int = 5):
     spread = fragment_midpoint * ((math.sin(move) + 1) / 2)
     step = math.pi / spread
 
-    # Start time
     start_time = time.time()
     while time.time() - start_time < duration:
 
         for fragment in range(fragment_amount):
-            midpoint[fragment] += 0.05
+            midpoint[fragment] += midpoint_increase
 
             if midpoint[fragment] > led_object.num_leds:
                 midpoint[fragment] = 0
@@ -1097,45 +1117,46 @@ def shrink_and_grow_multiple_moving(led_object, duration: int = 5):
                 brightness = (brightness + 1) / 2
                 brightness = int(brightness * 255)
 
-                leds[int((pos + i) % led_object.num_leds)] = 0, 0, brightness
+                leds[int((pos + i) % led_object.num_leds)] = 110, 32, brightness
 
                 if pos - i < 0:
                     leds[int(pos + led_object.num_leds - i)] = (
-                        0,
-                        0,
+                        80,
+                        80,
                         brightness,
                     )
                 else:
-                    leds[int(pos - i)] = 128, 0, brightness
+                    leds[int(pos - i)] = 128, 54, brightness
 
         NEOPIXEL.ShowNeoPixels(led_object, leds)
 
-        move += 0.05
+        move += move_increase
 
         # Small delay to control the speed of the animation
-        time.sleep(0.01)
+        time.sleep(speed)
 
 
-def snail(led_object, duration: int = 5):
+def snail(
+    led_object,
+    fragment_amount: int = 8,
+    snail_minimum_size: int = 6,
+    is_shrinking: bool = False,
+    snailbegin: int = 0,
+    snailend: int = 2,
+    speed: float = 0.01,
+    duration: int = 5,
+):
     """
     White wave effect.
     :param led_object: led object
+    :param int fragment_amount: number of fragments. Default is 8
     :param int duration: duration in seconds. Default is 5 seconds
     """
-    # TODO: Expose the animation speed
-    # TODO: add the limits of color 2 and 1 to certain limits according to palette
-    # TODO: improve segment verification according to the number of leds
-    move = 0
 
-    fragment_amount = 8
     fragment_size = led_object.num_leds // fragment_amount
-    small_minimum_size = 6
-    is_shrinking = False
-    snailbegin = 0
-    snailend = 2
 
-    leds = [(0, 0, 0)] * led_object.num_leds
-    # Start time
+    leds = [BLACK] * led_object.num_leds
+
     start_time = time.time()
     while time.time() - start_time < duration:
         snail_size = 0
@@ -1154,10 +1175,10 @@ def snail(led_object, duration: int = 5):
             brightness = int(brightness * 255)
 
             index = int((snailbegin + i) % led_object.num_leds)
-            leds[index] = 128, 128, brightness
+            leds[index] = 215, 128, brightness
 
         NEOPIXEL.ShowNeoPixels(led_object, leds)
-        time.sleep(0.01)
+        time.sleep(speed)
 
         if not is_shrinking:
             snailend += 0.08
@@ -1169,61 +1190,33 @@ def snail(led_object, duration: int = 5):
             snailbegin += 0.08
             if snailbegin >= led_object.num_leds:
                 snailbegin = 0
-            if snail_size < small_minimum_size:
+            if snail_size < snail_minimum_size:
                 is_shrinking = False
 
-        time.sleep(0.01)
 
-
-def segment_effect(
+def segments(
     led_object,
-    neopixel_list,
-    num_leds,
-    duration: int = 5,
     segment_length: int = 3,
     values: list = None,
+    speed: float = 0.1,
+    duration: int = 5,
 ):
+    """
+    Segment effect. This function will set values to segments of the led strip.
+    :param led_object: led object
+    :param int segment_length: segment length. Default is 3
+    :param list values: list of values. Default is None
+    :param float speed: speed of the animation. Default is 0.1 seconds
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
 
-    # TODO: Example of how to use this function
-    # TODO: Work on logic to assign animations to segments
-
-    led_list = [BLACK for _ in range(num_leds)]
+    led_list = [BLACK for _ in range(led_object.num_leds)]
 
     led_segments = get_led_segments(led_list, segment_length)
     assigned_segments = assign_values_to_segments(led_segments, values)
-    neopixel_list = flatten_segments(assigned_segments)
+    led_object.neopixel_list = flatten_segments(assigned_segments)
 
     start_time = time.time()
-
     while time.time() - start_time < duration:
-        NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
-        time.sleep(0.1)
-
-
-# def segment_animated_effect(
-#     led_object,
-#     neopixel_list,
-#     num_leds,
-#     duration: int = 5,
-#     segment_length: int = 3,
-#     values: list = None,
-#     animation=None,
-# ):
-
-#     # TODO: Example of how to use this function
-#     # TODO: Work on logic to assign animations to segments
-
-#     led_list = [BLACK for _ in range(num_leds)]
-
-#     led_segments = get_led_segments(led_list, segment_length)
-
-#     random_color(led_object, neopixel_list, 3, duration)
-
-#     # assigned_segments = assign_values_to_segments(led_segments, values)
-#     # neopixel_list = flatten_segments(assigned_segments)
-
-#     # start_time = time.time()
-
-#     # while time.time() - start_time < duration:
-#     #     NEOPIXEL.ShowNeoPixels(led_object, neopixel_list)
-#     #     time.sleep(0.1)
+        NEOPIXEL.ShowNeoPixels(led_object, led_object.neopixel_list)
+        time.sleep(speed)

@@ -1220,3 +1220,103 @@ def segments(
     while time.time() - start_time < duration:
         NEOPIXEL.ShowNeoPixels(led_object, led_object.neopixel_list)
         time.sleep(speed)
+
+
+def snail_multiple(
+    led_object,
+    fragment_amount: int = 8,
+    snail_minimum_size: int = 6,
+    is_shrinking: bool = False,
+    snailbegin: int = 0,
+    snailend: int = 2,
+    speed: float = 0.01,
+    duration: int = 5,
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param int fragment_amount: number of fragments. Default is 8
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+
+    fragment_size = led_object.num_leds // fragment_amount
+
+    leds = [BLACK] * led_object.num_leds
+
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        snail_size = 0
+
+        if snailend >= snailbegin:
+            snail_size = snailend - snailbegin
+        else:
+            snail_size = fragment_size - snailbegin + snailend
+
+        spread = snail_size
+        step = 2 * math.pi / spread
+
+        for i in range(spread):
+            brightness = math.cos(math.pi + (i * step))
+            brightness = (brightness + 1) / 2
+            brightness = int(brightness * 255)
+
+            for j in range(fragment_amount):
+                index = int((snailbegin + i) % fragment_size)
+                index += j * fragment_size
+                leds[index] = 215, 128, brightness
+
+        NEOPIXEL.ShowNeoPixels(led_object, leds)
+        time.sleep(speed)
+
+        if not is_shrinking:
+            snailend += 0.1
+            if snailend >= fragment_size:
+                snailend = 0
+            if snail_size > fragment_size - 1:
+                is_shrinking = True
+        else:
+            snailbegin += 0.1
+            if snailbegin >= fragment_size:
+                snailbegin = 0
+            if snail_size < snail_minimum_size:
+                is_shrinking = False
+
+
+def scanner(
+    led_object,
+    scanner_size: int = 10,
+    speed: float = 0.01,
+    duration: int = 5,
+):
+    """
+    White wave effect.
+    :param led_object: led object
+    :param int scanner size: scanner size. Default is 8
+    :param int duration: duration in seconds. Default is 5 seconds
+    """
+
+    position = 0
+    direction = False
+
+    leds = [BLACK] * led_object.num_leds
+
+    start_time = time.time()
+    while time.time() - start_time < duration:
+        step = 2 * math.pi / scanner_size
+
+        for i in range(scanner_size):
+            brightness = math.cos(math.pi + (i * step))
+            brightness = (brightness + 1) / 2
+            brightness = int(brightness * 255)
+
+            leds[position + i] = 215, 128, max(brightness, 30)
+
+        NEOPIXEL.ShowNeoPixels(led_object, leds)
+        time.sleep(speed)
+
+        if position == led_object.num_leds - scanner_size or position == 0:
+            direction = not direction
+        if direction:
+            position += 1
+        else:
+            position -= 1

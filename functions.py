@@ -162,3 +162,34 @@ def hsv_to_rgb(
         return chroma3, chroma1, val
     if i == 5:
         return val, chroma1, chroma2
+
+
+def colorwheel(color_value: int) -> tuple:
+    """
+    Author(s): Kattni Rembor, Carter Nelson
+    A colorwheel. ``0`` and ``255`` are red, ``85`` is green, and ``170`` is blue, with the values
+    between being the rest of the rainbow.
+
+    :param int color_value: 0-255 of color value to return
+    :return: tuple of RGB values
+    """
+    color_value = int(color_value)
+    if color_value < 0 or color_value > 255:
+        red = 0
+        green = 0
+        blue = 0
+    elif color_value < 85:
+        red = int(255 - color_value * 3)
+        green = int(color_value * 3)
+        blue = 0
+    elif color_value < 170:
+        color_value -= 85
+        red = 0
+        green = int(255 - color_value * 3)
+        blue = int(color_value * 3)
+    else:
+        color_value -= 170
+        red = int(color_value * 3)
+        green = 0
+        blue = int(255 - color_value * 3)
+    return (red, green, blue)

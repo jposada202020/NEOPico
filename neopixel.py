@@ -125,7 +125,7 @@ class NEOPIXEL:
     def fill_all(
         self,
         duration: int = 0.1,
-        time_delta: float = 0.1,
+        time_delta: float = 0.0,
         color: tuple = (255, 0, 0),
     ) -> None:
         """
